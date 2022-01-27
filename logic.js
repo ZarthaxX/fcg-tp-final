@@ -61,6 +61,10 @@ class Wall {
 
     changeState(){}
     
+    toGeometry(mapper) {
+        return mapper.mapToWall(this)
+    }
+
     print(){
         return "#"
     }
@@ -94,6 +98,10 @@ class Path {
     }
     
     changeState(){}
+  
+    toGeometry(mapper) {
+        return mapper.mapToPath(this)
+    }
 
     print(){
         return " "
@@ -156,6 +164,10 @@ class Door {
         this.state = !this.state
     }
 
+    toGeometry(mapper) {
+        return mapper.mapToDoor(this)
+    }
+
     print(){
         if(this.state)
             return '.'
@@ -191,6 +203,10 @@ class Chest {
     }
 
     changeState(){}
+
+    toGeometry(mapper) {
+        return mapper.mapToChest(this)
+    }
 
     print(){
         return "C"

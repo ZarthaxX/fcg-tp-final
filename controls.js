@@ -2,6 +2,7 @@ document.onkeydown = checkKey;
 window.addEventListener("load", initGame);
 
 var maze
+var mazeGeometry
 
 function checkKey(e) {
 
@@ -29,7 +30,13 @@ function checkKey(e) {
     } else if (e.keyCode == '32') {
         maze.playerOpenDoor()
         updateMaze()
+        updateMazeGeometry()
     }
+}
+
+function updateMazeGeometry() {
+    var mazeGeometryMapper = new MazeGeometryMapper()
+    mazeGeometry = mazeGeometryMapper.convertMazeToGeometry(maze)
 }
 
 function getRandomInt(min, max) {
@@ -58,6 +65,7 @@ function initGame() {
     var mazeGenerator = new MazeGenerator(width, height)
     maze = mazeGenerator.makeMaze(new Point(initialX, initialY))
     updateMaze()
+    updateMazeGeometry()
 }
 
 function updateMaze(){
