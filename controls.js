@@ -32,9 +32,31 @@ function checkKey(e) {
     }
 }
 
-function initGame() {     
-    var mazeGenerator = new MazeGenerator(21, 21)
-    maze = mazeGenerator.makeMaze(new Point(13, 13))
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function initGame() {   
+    var width = getRandomInt(11, 21)
+    if(width % 2 == 0){
+        width++
+    }
+    var height = getRandomInt(11, 21)
+    if(height % 2 == 0){
+        height++
+    }
+    var initialX = getRandomInt(1, width-2)
+    if(initialX % 2 == 0){
+        initialX++
+    }
+    var initialY = getRandomInt(1, height-2)
+    if(initialY % 2 == 0){
+        initialY++
+    }
+    var mazeGenerator = new MazeGenerator(width, height)
+    maze = mazeGenerator.makeMaze(new Point(initialX, initialY))
     updateMaze()
 }
 
