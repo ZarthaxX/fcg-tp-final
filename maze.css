@@ -1,0 +1,33 @@
+.ascii-art {
+    font-family: monospace;
+    white-space: pre;
+}
+
+#maze {
+    letter-spacing: .4rem;
+    background-color: #1e1e1e;
+    color: lawngreen;
+    transition: color .15s ease-in-out;
+    width: fit-content;
+    padding: 0.4rem 0.2rem 0.4rem 0.6rem;
+}
+
+fieldset {
+    padding: 0rem 0.0rem 0rem 0rem;
+    border-width: .15rem 0 0 0;
+    border-style: solid;
+    border-color: #ddd;
+    min-width: calc(100% - 10px);
+    max-width: calc(100% - 10px);
+}
+
+fieldset.mapview { text-align: -webkit-center; }
+
+fieldset > legend {
+    font-size: larger;
+    width: inherit;
+    padding: 0px .5rem;
+    margin-bottom: 0px;
+    margin-left: 0rem;
+    text-align: center;
+}

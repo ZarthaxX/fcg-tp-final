@@ -43,9 +43,23 @@ class Wall {
         return false
     }
 
+    isChest(){
+        return false
+    }
+
     isPath() {
         return false
     }
+    
+    canEnter(dir) {
+        return false
+    }
+
+    canLeave(dir) {
+        return false
+    }
+
+    changeState(){}
     
     print(){
         return "#"
@@ -63,9 +77,23 @@ class Path {
         return false
     }
 
+    isChest(){
+        return false
+    }
+
     isPath() {
         return true
     }
+
+    canEnter(dir) {
+        return true
+    }
+
+    canLeave(dir) {
+        return true
+    }
+    
+    changeState(){}
 
     print(){
         return " "
@@ -94,11 +122,43 @@ class Door {
         return false
     }
 
+    isChest(){
+        return false
+    }
+
     isPath() {
         return false
     }
+
+    canEnter(dir) {
+        if(this.state)
+            return true
+
+        switch(this.direction){
+            case NORTH:
+                return dir != SOUTH
+            case SOUTH:
+                return dir != NORTH
+            case WEST:
+                return dir != EAST
+            case EAST:
+                return dir != WEST
+        }
+    }
+
+    canLeave(dir) {
+        if(this.state)
+            return true
+        return this.direction != dir
+    }
     
+    changeState(){
+        this.state = !this.state
+    }
+
     print(){
+        if(this.state)
+            return '.'
         return this.direction.toString()
     }
 }
@@ -114,12 +174,47 @@ class Chest {
         return false
     }
 
+    isChest(){
+        return true
+    }
+
     isPath() {
         return false
     }
 
+    canEnter(dir) {
+        return true
+    }
+
+    canLeave(dir) {
+        return true
+    }
+
+    changeState(){}
+
     print(){
         return "C"
+    }
+}
+
+class Player {
+    constructor(point, direction){
+        this.point = point
+        this.direction = direction
+    }
+
+    moveInDirection(direction) {
+        var dirVec = directionsVec[direction]
+        this.point = this.point.sum(dirVec)
+        this.direction = direction
+    }
+
+    pointInDirection(direction) {
+        this.direction = direction
+    }
+    
+    print(){
+        return "P"
     }
 }
 
@@ -132,7 +227,16 @@ class Maze{
         this.cells = Array(height)
         for(var y = 0; y < height; y++)
             this.cells[y] = Array(width).fill(new Wall())
-        this.player = new Point(-1, -1)
+        this.player = new Player(new Point(-1,-1), NORTH)
+    }
+
+    playerOpenDoor() {
+        var direction = this.player.direction
+        var dirVec = directionsVec[direction]
+        var leaving = this.player.point
+        var entering = this.player.point.sum(dirVec)
+        this.cells[leaving.y][leaving.x].changeState()
+        this.cells[entering.y][entering.x].changeState()
     }
 
     isWall(cell){
@@ -169,7 +273,7 @@ class Maze{
 
     setPlayer(cell) {
         if (this.cellInBounds(cell)) {
-            this.player = new Point(cell.x, cell.y)
+            this.player = new Player(cell, NORTH)
         }
         else{
             throw "coordinates out of range"
@@ -190,28 +294,39 @@ class Maze{
     }
 
     movePlayer(direction) {
-        var dirVec = directionsVec[direction]
-        if(this.playerCanGoInDirection(dirVec)){
-            this.player = nextCell
+        this.player.pointInDirection(direction)
+        if(this.playerCanGoInDirection(direction)){
+           this.player.moveInDirection(direction)
         }
     }
 
-    playerCanGoInDirection(dirVec) {
-        if 
+    playerCanGoInDirection(direction) {
+        var dirVec = directionsVec[direction]
+        var leaving = this.player.point
+        var entering = this.player.point.sum(dirVec)
+        return this.cellInBounds(entering) 
+            && this.cells[leaving.y][leaving.x].canLeave(direction)
+            && this.cells[entering.y][entering.x].canEnter(direction)
     }
 
-    print(){
-        console.log("printing maze...")
+    chestWasReached(){
+        var cell = this.player.point
+        return this.cells[cell.y][cell.x].isChest()
+    }
+
+    toString(){
+        var maze = ""
         for(var y = 0;y < this.height; y++){
             var row = ""
             for(var x = 0;x < this.width;x++){
-                if(this.player.x == x && this.player.y == y)
+                if(this.player.point.x == x && this.player.point.y == y)
                     row += "P"
                 else
                     row += this.cells[y][x].print()
             }
-            console.log(row)
+            maze += row + "\n"
         }
+        return maze
     }
 }
 
@@ -230,7 +345,6 @@ class MazeGenerator{
 
     makeMaze(startCell){
         var maze = new Maze(this.width, this.height)
-        maze.print()
         var states = [this.buildNewState(startCell)]
         maze.setPath(startCell)
 
@@ -279,7 +393,3 @@ class MazeGenerator{
         return new MazeGenerationState(cell, randomizedDirections)
     }
 }
-
-mazeGenerator = new MazeGenerator(21, 21)
-maze = mazeGenerator.makeMaze(new Point(13, 13))
-maze.print()
