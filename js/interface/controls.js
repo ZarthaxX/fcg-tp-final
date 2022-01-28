@@ -46,11 +46,11 @@ function getRandomInt(min, max) {
 }
 
 function initGame() {   
-    var width = getRandomInt(11, 21)
+    var width = getRandomInt(3, 13)
     if(width % 2 == 0){
         width++
     }
-    var height = getRandomInt(11, 21)
+    var height = getRandomInt(3, 21)
     if(height % 2 == 0){
         height++
     }

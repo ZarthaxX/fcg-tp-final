@@ -1,25 +1,45 @@
-<!DOCTYPE html>
-<html lang="en-US">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="maze.css">
-    <title>Today's Date</title>
-    <script src="./controls.js"></script>
-    <script src="./logic.js"></script>
-    <script src="./mazeGeometry.js"></script>
-</head>
-
-<body>
-    <div>
-        <fieldset class="mapview">
-            <legend>Map</legend>
-            <pre class="mapview" id="maze"></pre>
-        </fieldset>
-    </div>
-</body>
-
-
-
 </html>
+
+<doctype html>
+    <html>
+    <head>
+    <title> FCG 2021 - TP FINAL</title>
+    
+    <!-- estilo-->
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/maze.css" rel="stylesheet">
+    
+    <script type="text/javascript" id="includedscript" src="js/interface/boxdrawer.js"></script>
+    <script type="text/javascript" id="includedscript" src="js/interface/lightview.js"></script>
+    <script type="text/javascript" id="includedscript" src="js/interface/project5.js"></script>
+    <script type="text/javascript" id="includedscript" src="js/interface/ejercicio.js"></script>
+    <script type="text/javascript" id="includedscript" src="js/interface/controls.js"></script>
+    <script type="text/javascript" id="includedscript" src="js/maze/logic.js"></script>
+    <script type="text/javascript" id="includedscript" src="js/maze/mazeGeometry.js"></script>
+    <script type="text/javascript" src="js/interface/objmesh.js"></script>
+    
+    </head>
+    <body onresize="WindowResize()">
+        <!-- canvas (WebGL)-->
+        <div id="canvas-div"><canvas id="canvas"></canvas></div><div id="controls-div">
+        <!-- menu y controles-->
+        <div id="controls">
+            <div class="control-group"><canvas id="lightcontrol"></canvas><div id="lightcontrol-label">Dirección de la Luz</div></div>
+            <div class="control-group">
+                <div class="control"><input id="show-box" name="show-box" type="checkbox" onchange="DrawScene()" checked /><label for="show-box"> Mostrar caja</label></div>
+                <div class="control"><input id="rotation-speed" type="range" min="1" max="100" value="50" disabled/></div>
+                <div class="control"><span id="shininess-label">Intensidad:</span><span id="shininess-value">1</span><input id="shininess-exp" type="range" min="0" max="100" value="50" oninput="SetShininess(this)"/></div>
+            </div>
+            <div class="control-group">
+                <img id="texture-img" />
+            </div>
+            <div class="control-group">
+                <fieldset class="mapview">
+                    <legend>Laberinto</legend>
+                    <pre class="mapview" id="maze"></pre>
+                </fieldset>
+            </div>
+        </div>
+        </div>
+    </body>
+    </html>
