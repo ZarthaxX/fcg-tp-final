@@ -68,26 +68,18 @@ class MeshDrawer
 	// normals [n0,n0,n0,n1,n1,n1,...]. De manera similar, las 
 	// cooredenadas de textura se componen de a 2 elementos 
 	// consecutivos y se  asocian a cada vértice en orden. 
-	setMesh(vertPos, texCoords, normals)
+	setMesh(vertPos, normals)
 	{
 		this.numTriangles = vertPos.length / 3 / 3;
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferPos);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertPos), gl.STATIC_DRAW);
 		
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferText);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoords), gl.STATIC_DRAW);
+		//gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferText);
+		//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoords), gl.STATIC_DRAW);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferNorm);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
-	}
-	
-	// Esta función se llama cada vez que el usuario cambia el estado del checkbox 'Intercambiar Y-Z'
-	// El argumento es un boleano que indica si el checkbox está tildado
-	swapYZ(swap)
-	{
-		gl.useProgram(this.prog);
-		gl.uniform1i(this.swap, swap);
 	}
 	
 	// Esta función se llama para dibujar la malla de triángulos
@@ -107,9 +99,9 @@ class MeshDrawer
 		gl.vertexAttribPointer(this.vert, 3, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(this.vert);
 		
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferText);
-		gl.vertexAttribPointer(this.texCoord, 2, gl.FLOAT, false, 0, 0);
-		gl.enableVertexAttribArray(this.texCoord);
+		// gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferText);
+		// gl.vertexAttribPointer(this.texCoord, 2, gl.FLOAT, false, 0, 0);
+		// gl.enableVertexAttribArray(this.texCoord);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferNorm);
 		gl.vertexAttribPointer(this.normal, 3, gl.FLOAT, false, 0, 0);
@@ -218,10 +210,8 @@ var meshFS = `
 		vec3 v = normalize(vertCoord);
 		vec3 n = normalize(mn * (normalize(normCoord)));
 		vec3 h = normalize(v + l);
-
 		float cosTheta = dot(n, l);
 		float cosOmega = dot(n, h);
-
 		gl_FragColor =  
 			vec4(1.0, 1.0, 1.0, 1.0) *
 			max(0.0, cosTheta) *

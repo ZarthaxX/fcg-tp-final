@@ -361,6 +361,7 @@ class MazeGenerator{
 
     makeMaze(startCell){
         var maze = new Maze(this.width, this.height)
+        //return maze
         var states = [this.buildNewState(startCell)]
         maze.setPath(startCell)
 
@@ -372,9 +373,6 @@ class MazeGenerator{
             }
 
             var nextDirection = currentState.directions.pop()
-            console.log(nextDirection)
-            console.log(directionsVec)
-            console.log(directionsVec[SOUTH])
             var nextCell = directionsVec[nextDirection].scalarProduct(2).sum(currentState.cell)
             if(maze.isWall(nextCell)){
                 var linkCell = directionsVec[nextDirection].sum(currentState.cell)

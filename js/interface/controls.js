@@ -30,13 +30,14 @@ function checkKey(e) {
     } else if (e.keyCode == '32') {
         maze.playerOpenDoor()
         updateMaze()
-        updateMazeGeometry()
     }
+    updateMazeGeometry()
+    DrawScene();
 }
 
 function updateMazeGeometry() {
     var mazeGeometryMapper = new MazeGeometryMapper()
-    mazeGeometry = mazeGeometryMapper.convertMazeToGeometry(maze)
+    meshDrawer.setMesh(...mazeGeometryMapper.convertMazeToGeometry(maze))
 }
 
 function getRandomInt(min, max) {
@@ -45,12 +46,17 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+const MIN_WIDTH = 3;
+const MIN_HEIGHT = 3;
+const MAX_WIDTH = 11;
+const MAX_HEIGHT = 11;
+
 function initGame() {   
-    var width = getRandomInt(3, 13)
+    var width = getRandomInt(MIN_WIDTH, MAX_WIDTH)
     if(width % 2 == 0){
         width++
     }
-    var height = getRandomInt(3, 21)
+    var height = getRandomInt(MIN_HEIGHT, MAX_HEIGHT)
     if(height % 2 == 0){
         height++
     }
@@ -66,6 +72,7 @@ function initGame() {
     maze = mazeGenerator.makeMaze(new Point(initialX, initialY))
     updateMaze()
     updateMazeGeometry()
+    DrawScene();
 }
 
 function updateMaze(){

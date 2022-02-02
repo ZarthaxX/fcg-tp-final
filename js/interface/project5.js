@@ -206,8 +206,6 @@ window.onload = function()
 				rotX += (cy - event.clientY)/canvas.height*5;
 				cx = event.clientX;
 				cy = event.clientY;
-				console.log(rotX);
-				console.log(rotY);
 				UpdateProjectionMatrix();
 				DrawScene();
 			}
