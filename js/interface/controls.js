@@ -46,10 +46,10 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const MIN_WIDTH = 3;
-const MIN_HEIGHT = 3;
-const MAX_WIDTH = 11;
-const MAX_HEIGHT = 11;
+const MIN_WIDTH = 5;
+const MIN_HEIGHT = 7;
+const MAX_WIDTH = 5;
+const MAX_HEIGHT = 7;
 
 function initGame() {   
     var width = getRandomInt(MIN_WIDTH, MAX_WIDTH)
@@ -72,7 +72,6 @@ function initGame() {
     maze = mazeGenerator.makeMaze(new Point(initialX, initialY))
     updateMaze()
     updateMazeGeometry()
-    DrawScene();
 }
 
 function updateMaze(){

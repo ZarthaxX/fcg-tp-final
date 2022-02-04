@@ -37,6 +37,7 @@ class MeshDrawer
 	// El constructor es donde nos encargamos de realizar las inicializaciones necesarias. 
 	constructor()
 	{
+		const gl = canvas.getContext('webgl');
 		this.prog   = InitShaderProgram(meshVS, meshFS);
 
 		this.swap = gl.getUniformLocation(this.prog, 'swap');
@@ -68,15 +69,15 @@ class MeshDrawer
 	// normals [n0,n0,n0,n1,n1,n1,...]. De manera similar, las 
 	// cooredenadas de textura se componen de a 2 elementos 
 	// consecutivos y se  asocian a cada vértice en orden. 
-	setMesh(vertPos, normals)
+	setMesh(vertPos, texCoords, normals)
 	{
 		this.numTriangles = vertPos.length / 3 / 3;
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferPos);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertPos), gl.STATIC_DRAW);
 		
-		//gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferText);
-		//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoords), gl.STATIC_DRAW);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferText);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoords), gl.STATIC_DRAW);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferNorm);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
@@ -99,9 +100,9 @@ class MeshDrawer
 		gl.vertexAttribPointer(this.vert, 3, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(this.vert);
 		
-		// gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferText);
-		// gl.vertexAttribPointer(this.texCoord, 2, gl.FLOAT, false, 0, 0);
-		// gl.enableVertexAttribArray(this.texCoord);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferText);
+		gl.vertexAttribPointer(this.texCoord, 2, gl.FLOAT, false, 0, 0);
+		gl.enableVertexAttribArray(this.texCoord);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferNorm);
 		gl.vertexAttribPointer(this.normal, 3, gl.FLOAT, false, 0, 0);

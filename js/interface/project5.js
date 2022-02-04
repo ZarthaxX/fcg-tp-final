@@ -171,7 +171,6 @@ window.onload = function()
 {
 	showBox = document.getElementById('show-box');
 	InitWebGL();
-	
 	// Componente para la luz
 	lightView = new LightView();
 
