@@ -328,7 +328,7 @@ class Maze{
     chestWasReached(){
         var cell = this.player.point
         return this.cells[cell.y][cell.x].isChest()
-        //return false
+        // return false
     }
 
     toString(){
@@ -362,7 +362,9 @@ class MazeGenerator{
 
     makeMaze(startCell){
         var maze = new Maze(this.width, this.height)
-        // return maze
+        if(this.width <= 3 && this.height <= 3){
+            return maze   
+        }
         var states = [this.buildNewState(startCell)]
         maze.setPath(startCell)
 
