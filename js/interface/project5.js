@@ -26,12 +26,10 @@ function InitWebGL()
 	
 	// Inicializar los shaders y buffers para renderizar	
 	boxDrawer  = new BoxDrawer();
-	meshFloor = new MeshDrawer();
 	meshWall = new MeshDrawer();
+	meshFloor = new MeshDrawer();
 	LoadTexture(wallTexture, meshWall);
-	meshWall.showTexture( true );
 	LoadTexture(floorTexture,meshFloor);
-	meshFloor.showTexture( true );
 	// Setear el tamaño del viewport
 	UpdateCanvasSize();
 }
@@ -186,6 +184,7 @@ window.onload = function()
 	{
 		transZ *= s/canvas.height + 1;
 		UpdateProjectionMatrix();
+		DrawScene();
 	}
 	canvas.onwheel = function() { canvas.zoom(0.3*event.deltaY); }
 
@@ -212,6 +211,7 @@ window.onload = function()
 				cx = event.clientX;
 				cy = event.clientY;
 				UpdateProjectionMatrix();
+				DrawScene();
 			}
 		}
 	}

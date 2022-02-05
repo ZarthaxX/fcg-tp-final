@@ -34,14 +34,17 @@ function GetModelViewMatrix(translationX, translationY, translationZ, rotationX,
 // [COMPLETAR] Completar la implementación de esta clase.
 class MeshDrawer
 {
+	static meshCounter = 0;
 	// El constructor es donde nos encargamos de realizar las inicializaciones necesarias. 
 	constructor()
 	{
+		this.meshID = MeshDrawer.getNextID();
 		this.prog   = InitShaderProgram(meshVS, meshFS);
 
 		this.swap = gl.getUniformLocation(this.prog, 'swap');
 		this.showTex = gl.getUniformLocation(this.prog, 'showTex');
 		this.sampler = gl.getUniformLocation(this.prog, 'texGPU');
+
 		this.lightDir = gl.getUniformLocation(this.prog, 'lightDir');
 		this.alpha = gl.getUniformLocation(this.prog, 'alpha');
 		this.mvp = gl.getUniformLocation(this.prog, 'mvp');
@@ -56,8 +59,12 @@ class MeshDrawer
 		this.bufferText = gl.createBuffer();
 		this.bufferNorm = gl.createBuffer();
 		this.texture = gl.createTexture(); 
+		
 	}
 	
+	static getNextID() {
+		return this.meshCounter++;
+	}
 	// Esta función se llama cada vez que el usuario carga un nuevo
 	// archivo OBJ. En los argumentos de esta función llegan un areglo
 	// con las posiciones 3D de los vértices, un arreglo 2D con las
@@ -90,7 +97,10 @@ class MeshDrawer
 	draw(matrixMVP, matrixMV, matrixNormal)
 	{
 		gl.useProgram(this.prog);
-	
+		gl.uniform1i(this.sampler, this.meshID);  // texture unit meshID
+		//gl.activeTexture(gl.TEXTURE0+this.meshID);
+		//gl.bindTexture(gl.TEXTURE_2D, this.texture);
+
 		gl.uniformMatrix4fv(this.mvp, false, matrixMVP);
 		gl.uniformMatrix4fv(this.mv, false, matrixMV);
 		gl.uniformMatrix3fv(this.mn, false, matrixNormal);
@@ -114,6 +124,7 @@ class MeshDrawer
 	// El argumento es un componente <img> de html que contiene la textura. 
 	setTexture(img)
 	{
+		//gl.activeTexture(gl.TEXTURE0+this.meshID);
 		gl.bindTexture(gl.TEXTURE_2D, this.texture);
 		gl.texImage2D(
 			gl.TEXTURE_2D,
@@ -124,8 +135,6 @@ class MeshDrawer
 			img
 		);
 		gl.generateMipmap(gl.TEXTURE_2D);
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, this.texture);
 	}
 		
         // Esta función se llama cada vez que el usuario cambia el estado del checkbox 'Mostrar textura'

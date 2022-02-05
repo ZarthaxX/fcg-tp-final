@@ -262,8 +262,8 @@ class MazeGeometryMapper {
     
     convertMazeToGeometry(maze) {
         return [
-            this.generateRoofGeometry(maze),
             this.generateWallsGeometry(maze),
+            this.generateRoofGeometry(maze),
         ]
     }
 
