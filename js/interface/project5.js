@@ -1,6 +1,7 @@
 // Estructuras globales e inicializaciones
 var boxDrawer;          // clase para contener el comportamiento de la caja
 var meshDrawer;         // clase para contener el comportamiento de la malla
+var meshFloor;
 var canvas, gl;         // canvas y contexto WebGL
 var perspectiveMatrix;	// matriz de perspectiva
 
@@ -25,8 +26,12 @@ function InitWebGL()
 	
 	// Inicializar los shaders y buffers para renderizar	
 	boxDrawer  = new BoxDrawer();
-	meshDrawer = new MeshDrawer();
-	
+	meshFloor = new MeshDrawer();
+	meshWall = new MeshDrawer();
+	LoadTexture(wallTexture, meshWall);
+	meshWall.showTexture( true );
+	LoadTexture(floorTexture,meshFloor);
+	meshFloor.showTexture( true );
 	// Setear el tamaño del viewport
 	UpdateCanvasSize();
 }
@@ -91,7 +96,9 @@ function DrawScene()
 	
 	// 3. Le pedimos a cada objeto que se dibuje a si mismo
 	var nrmTrans = [ mv[0],mv[1],mv[2], mv[4],mv[5],mv[6], mv[8],mv[9],mv[10] ];
-	meshDrawer.draw( mvp, mv, nrmTrans );
+	meshWall.draw( mvp, mv, nrmTrans );
+	meshFloor.draw( mvp, mv, nrmTrans );
+	
 	if ( showBox.checked ) {
 		boxDrawer.draw( mvp );
 	}
@@ -179,7 +186,6 @@ window.onload = function()
 	{
 		transZ *= s/canvas.height + 1;
 		UpdateProjectionMatrix();
-		DrawScene();
 	}
 	canvas.onwheel = function() { canvas.zoom(0.3*event.deltaY); }
 
@@ -206,7 +212,6 @@ window.onload = function()
 				cx = event.clientX;
 				cy = event.clientY;
 				UpdateProjectionMatrix();
-				DrawScene();
 			}
 		}
 	}
@@ -219,8 +224,6 @@ window.onload = function()
 	
 	SetShininess( document.getElementById('shininess-exp') );
 	
-	// Dibujo la escena
-	DrawScene();
 };
 
 // Evento resize
@@ -260,15 +263,14 @@ function AutoRotate( param )
 // Control de textura visible
 function ShowTexture( param )
 {
-	meshDrawer.showTexture( param.checked );
-	DrawScene();
+	meshWall.showTexture( param.checked );
+	meshFloor.showTexture( param.checked );
 }
 
 // Control de intercambiar y-z
 function SwapYZ( param )
 {
 	meshDrawer.swapYZ( param.checked );
-	DrawScene();
 }
 
 // Cargar archivo obj
@@ -304,23 +306,14 @@ function LoadObj( param )
 }
 
 // Cargar textura
-function LoadTexture( param )
+function LoadTexture(texture, mesh )
 {
-	if ( param.files && param.files[0] ) 
+	img = new Image();
+	img.onload = function() 
 	{
-		var reader = new FileReader();
-		reader.onload = function(e) 
-		{
-			var img = document.getElementById('texture-img');
-			img.onload = function() 
-			{
-				meshDrawer.setTexture( img );
-				DrawScene();
-			}
-			img.src = e.target.result;
-		};
-		reader.readAsDataURL( param.files[0] );
+		mesh.setTexture( img );
 	}
+	img.src = texture
 }
 
 // Setear Intensidad
@@ -329,7 +322,7 @@ function SetShininess( param )
 	var exp = param.value;
 	var s = Math.pow(10,exp/25);
 	document.getElementById('shininess-value').innerText = s.toFixed( s < 10 ? 2 : 0 );
-	meshDrawer.setShininess(s);
-	DrawScene();
+	meshWall.setShininess(s);
+	meshFloor.setShininess(s);
 }
 

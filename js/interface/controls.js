@@ -37,7 +37,10 @@ function checkKey(e) {
 
 function updateMazeGeometry() {
     var mazeGeometryMapper = new MazeGeometryMapper()
-    meshDrawer.setMesh(...mazeGeometryMapper.convertMazeToGeometry(maze))
+    var meshDrawers = mazeGeometryMapper.convertMazeToGeometry(maze)
+    for(var i = 0; i < meshDrawers.length; i++) {
+        meshDrawers[i]()
+    }
 }
 
 function getRandomInt(min, max) {
@@ -72,6 +75,7 @@ function initGame() {
     maze = mazeGenerator.makeMaze(new Point(initialX, initialY))
     updateMaze()
     updateMazeGeometry()
+    DrawScene()
 }
 
 function updateMaze(){

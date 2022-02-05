@@ -37,7 +37,6 @@ class MeshDrawer
 	// El constructor es donde nos encargamos de realizar las inicializaciones necesarias. 
 	constructor()
 	{
-		const gl = canvas.getContext('webgl');
 		this.prog   = InitShaderProgram(meshVS, meshFS);
 
 		this.swap = gl.getUniformLocation(this.prog, 'swap');
@@ -200,10 +199,7 @@ var meshFS = `
 
 	void main()
 	{	
-		if(showTex == 1)	
-			gl_FragColor = texture2D(texGPU, texCoord);
-		else
-			gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+		gl_FragColor = texture2D(texGPU, texCoord);
 
 		vec4 kd = gl_FragColor;
 		vec4 ks = vec4(1.0, 1.0, 1.0, 1.0);

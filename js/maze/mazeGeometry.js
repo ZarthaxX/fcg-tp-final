@@ -81,20 +81,20 @@ const facesTextures = {
     ],
     // Right
     "RIGHT" : [
-        0.0,  0.0,
+        1.0,  1.0,
         1.0,  0.0,
-        1.0,  1.0,
         0.0,  0.0,
-        0.0,  1.0,
         1.0,  1.0,
+        0.0,  1.0,
+        0.0,  0.0,
     ],
     // Left
     "LEFT" : [
         0.0,  0.0,
-        1.0,  0.0,
-        1.0,  1.0,
-        1.0,  1.0,
         0.0,  1.0,
+        1.0,  1.0,
+        1.0,  1.0,
+        1.0,  0.0,
         0.0,  0.0,
     ]
 };
@@ -248,10 +248,26 @@ const chestGeometry = new GeometryObjectData()
     .withScale(0.5)
     .toGeometryObject();
 
+
+class MeshDrawerData {
+    constructor(triangles, normals, textures){
+        this.triangles = triangles
+        this.normals = normals
+        this.textures = textures
+    }
+}
+
 class MazeGeometryMapper {
     constructor(){}
     
     convertMazeToGeometry(maze) {
+        return [
+            this.generateRoofGeometry(maze),
+            this.generateWallsGeometry(maze),
+        ]
+    }
+
+    generateWallsGeometry(maze) {
         var triangles = []
         var normals = []
         var textures = []
@@ -270,15 +286,13 @@ class MazeGeometryMapper {
         triangles.push(...meshTriangles)
         normals.push(...meshNormals)
         textures.push(...meshTextures)
-
-        var [roofTriangles, roofNormals, roofTextures] = this.generateRoof(maze)
-        triangles.push(...roofTriangles)
-        normals.push(...roofNormals)
-        textures.push(...roofTextures)
-        return [triangles, textures, normals]
+        
+        return function() {
+            meshWall.setMesh(triangles, textures, normals)
+        }
     }
 
-    generateRoof(maze) {
+    generateRoofGeometry(maze) {
         var triangles = []
         var normals = []
         var textures = []
@@ -291,7 +305,10 @@ class MazeGeometryMapper {
                 textures.push(...meshTextures)
             }
         }
-        return [triangles, normals, textures]
+
+        return function() {
+            meshFloor.setMesh(triangles, textures, normals)
+        }
     }
 
     mapToWall(wall) {
