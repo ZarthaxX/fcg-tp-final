@@ -56,9 +56,9 @@ function InitWebGL()
 	// Inicializar los shaders y buffers para renderizar	
 	boxDrawer  = new BoxDrawer();
 	meshDrawer = new MeshDrawer();
-	loadImages([floorTexture, wallTexture], (images) => {
+	loadImages([floorTexture, wallTexture, doorTexture, portalTexture], (images) => {
 		// create 2 textures
-		for (var ii = 0; ii < 2; ii++) {
+		for (var ii = 0; ii < images.length; ii++) {
 			var texture = gl.createTexture();
 			gl.bindTexture(gl.TEXTURE_2D, texture);
 		

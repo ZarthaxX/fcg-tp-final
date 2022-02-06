@@ -48,12 +48,15 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const MIN_WIDTH = 5;
-const MIN_HEIGHT = 7;
-const MAX_WIDTH = 5;
-const MAX_HEIGHT = 7;
+const MIN_WIDTH = 11;
+const MIN_HEIGHT = 11;
+const MAX_WIDTH = 11;
+const MAX_HEIGHT = 11;
 
-function initGame() {   
+function initGame() {  
+    const generator = new Math.seedrandom()
+    Math.random = generator;
+     
     var width = getRandomInt(MIN_WIDTH, MAX_WIDTH)
     if(width % 2 == 0){
         width++

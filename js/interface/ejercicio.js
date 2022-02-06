@@ -40,10 +40,8 @@ class MeshDrawer
 		this.prog   = InitShaderProgram(meshVS, meshFS);
 
 		this.swap = gl.getUniformLocation(this.prog, 'swap');
-		this.texID = gl.getUniformLocation(this.prog, 'texID');
 
-		this.samplerFloor = gl.getUniformLocation(this.prog, 'texFloor');
-		this.samplerWall = gl.getUniformLocation(this.prog, 'texWall');
+		this.sampler = gl.getUniformLocation(this.prog, 'texGPU');
 
 		this.lightDir = gl.getUniformLocation(this.prog, 'lightDir');
 		this.alpha = gl.getUniformLocation(this.prog, 'alpha');
@@ -117,14 +115,11 @@ class MeshDrawer
 		gl.enableVertexAttribArray(this.normal);
 
 		// set which texture units to render with.
-		gl.uniform1i(this.samplerFloor, 0);  // texture unit 0
-		gl.uniform1i(this.samplerWall, 1);  // texture unit 1
+		gl.uniform1i(this.sampler, 0);  // texture unit 0
 
 		// Set each texture unit to use a particular texture.
 		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, this.textures[0]);
-		gl.activeTexture(gl.TEXTURE1);
-		gl.bindTexture(gl.TEXTURE_2D, this.textures[1]);
+		gl.bindTexture(gl.TEXTURE_2D, this.textures[texID]);
 		// Set texture ID to use in shader
 		gl.uniform1i(this.texID, texID); 
 
@@ -186,9 +181,7 @@ var meshVS = `
 var meshFS = `
 	precision mediump float;
 	
-	uniform int texID;
-	uniform sampler2D texFloor;
-	uniform sampler2D texWall;
+	uniform sampler2D texGPU;
 	uniform vec3 lightDir;
 	uniform float alpha;
 	uniform mat3 mn;
@@ -199,10 +192,7 @@ var meshFS = `
 
 	void main()
 	{	
-		if(texID == 0)
-			gl_FragColor = texture2D(texFloor, texCoord);
-		if(texID == 1)
-			gl_FragColor = texture2D(texWall, texCoord);
+		gl_FragColor = texture2D(texGPU, texCoord);
 
 		vec4 kd = gl_FragColor;
 		vec4 ks = vec4(1.0, 1.0, 1.0, 1.0);
