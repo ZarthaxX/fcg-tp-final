@@ -3,6 +3,7 @@ window.addEventListener("load", initGame);
 
 var maze
 var mazeGeometry
+var mazeDrawers
 
 function checkKey(e) {
 
@@ -37,10 +38,8 @@ function checkKey(e) {
 
 function updateMazeGeometry() {
     var mazeGeometryMapper = new MazeGeometryMapper()
-    var meshDrawers = mazeGeometryMapper.convertMazeToGeometry(maze)
-    for(var i = 0; i < meshDrawers.length; i++) {
-        meshDrawers[i]()
-    }
+    mazeDrawers = mazeGeometryMapper.convertMazeToGeometry(maze)
+    DrawScene()
 }
 
 function getRandomInt(min, max) {

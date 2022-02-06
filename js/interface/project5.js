@@ -7,6 +7,35 @@ var perspectiveMatrix;	// matriz de perspectiva
 
 var rotX=0, rotY=0, transZ=3, autorot=0;
 
+var textures = [];
+
+function loadImage(url, callback) {
+	var image = new Image();
+	image.src = url;
+	image.onload = callback;
+	return image;
+  }
+  
+  function loadImages(urls, callback) {
+	var images = [];
+	var imagesToLoad = urls.length;
+  
+	// Called each time an image finished
+	// loading.
+	var onImageLoad = function() {
+	  --imagesToLoad;
+	  // If all the images are loaded call the callback.
+	  if (imagesToLoad === 0) {
+		callback(images);
+	  }
+	};
+  
+	for (var ii = 0; ii < imagesToLoad; ++ii) {
+	  var image = loadImage(urls[ii], onImageLoad);
+	  images.push(image);
+	}
+  }
+
 // Funcion de inicialización, se llama al cargar la página
 function InitWebGL()
 {
@@ -26,10 +55,27 @@ function InitWebGL()
 	
 	// Inicializar los shaders y buffers para renderizar	
 	boxDrawer  = new BoxDrawer();
-	meshWall = new MeshDrawer();
-	meshFloor = new MeshDrawer();
-	LoadTexture(wallTexture, meshWall);
-	LoadTexture(floorTexture,meshFloor);
+	meshDrawer = new MeshDrawer();
+	loadImages([floorTexture, wallTexture], (images) => {
+		// create 2 textures
+		for (var ii = 0; ii < 2; ii++) {
+			var texture = gl.createTexture();
+			gl.bindTexture(gl.TEXTURE_2D, texture);
+		
+			// Upload the image into the texture.
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, images[ii]);
+		
+			// Set the parameters so we can render any size image.
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+			// add the texture to the array of textures.
+			textures.push(texture);
+		}
+		meshDrawer.setTextures(textures)
+	});
 	// Setear el tamaño del viewport
 	UpdateCanvasSize();
 }
@@ -94,9 +140,12 @@ function DrawScene()
 	
 	// 3. Le pedimos a cada objeto que se dibuje a si mismo
 	var nrmTrans = [ mv[0],mv[1],mv[2], mv[4],mv[5],mv[6], mv[8],mv[9],mv[10] ];
-	meshWall.draw( mvp, mv, nrmTrans );
-	meshFloor.draw( mvp, mv, nrmTrans );
-	
+	console.log(mazeDrawers)
+	if(mazeDrawers != undefined)
+	for(var i = 0; i < mazeDrawers.length; i++) {
+		mazeDrawers[i](mvp, mv, nrmTrans);
+	}
+
 	if ( showBox.checked ) {
 		boxDrawer.draw( mvp );
 	}
@@ -305,24 +354,12 @@ function LoadObj( param )
 	}
 }
 
-// Cargar textura
-function LoadTexture(texture, mesh )
-{
-	img = new Image();
-	img.onload = function() 
-	{
-		mesh.setTexture( img );
-	}
-	img.src = texture
-}
-
 // Setear Intensidad
 function SetShininess( param )
 {
 	var exp = param.value;
 	var s = Math.pow(10,exp/25);
 	document.getElementById('shininess-value').innerText = s.toFixed( s < 10 ? 2 : 0 );
-	meshWall.setShininess(s);
-	meshFloor.setShininess(s);
+	meshDrawer.setShininess(s);
 }
 

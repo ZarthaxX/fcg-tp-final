@@ -34,16 +34,16 @@ function GetModelViewMatrix(translationX, translationY, translationZ, rotationX,
 // [COMPLETAR] Completar la implementación de esta clase.
 class MeshDrawer
 {
-	static meshCounter = 0;
 	// El constructor es donde nos encargamos de realizar las inicializaciones necesarias. 
 	constructor()
 	{
-		this.meshID = MeshDrawer.getNextID();
 		this.prog   = InitShaderProgram(meshVS, meshFS);
 
 		this.swap = gl.getUniformLocation(this.prog, 'swap');
-		this.showTex = gl.getUniformLocation(this.prog, 'showTex');
-		this.sampler = gl.getUniformLocation(this.prog, 'texGPU');
+		this.texID = gl.getUniformLocation(this.prog, 'texID');
+
+		this.samplerFloor = gl.getUniformLocation(this.prog, 'texFloor');
+		this.samplerWall = gl.getUniformLocation(this.prog, 'texWall');
 
 		this.lightDir = gl.getUniformLocation(this.prog, 'lightDir');
 		this.alpha = gl.getUniformLocation(this.prog, 'alpha');
@@ -58,7 +58,7 @@ class MeshDrawer
 		this.bufferPos = gl.createBuffer();
 		this.bufferText = gl.createBuffer();
 		this.bufferNorm = gl.createBuffer();
-		this.texture = gl.createTexture(); 
+		this.textures = []; 
 		
 	}
 	
@@ -94,10 +94,9 @@ class MeshDrawer
 	// la matriz model-view (matrixMV) que es retornada por 
 	// GetModelViewProjection y la matriz de transformación de las 
 	// normales (matrixNormal) que es la inversa transpuesta de matrixMV
-	draw(matrixMVP, matrixMV, matrixNormal)
+	draw(texID, matrixMVP, matrixMV, matrixNormal)
 	{
 		gl.useProgram(this.prog);
-		gl.uniform1i(this.sampler, this.meshID);  // texture unit meshID
 		//gl.activeTexture(gl.TEXTURE0+this.meshID);
 		//gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
@@ -117,37 +116,28 @@ class MeshDrawer
 		gl.vertexAttribPointer(this.normal, 3, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(this.normal);
 
+		// set which texture units to render with.
+		gl.uniform1i(this.samplerFloor, 0);  // texture unit 0
+		gl.uniform1i(this.samplerWall, 1);  // texture unit 1
+
+		// Set each texture unit to use a particular texture.
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, this.textures[0]);
+		gl.activeTexture(gl.TEXTURE1);
+		gl.bindTexture(gl.TEXTURE_2D, this.textures[1]);
+		// Set texture ID to use in shader
+		gl.uniform1i(this.texID, texID); 
+
 		gl.drawArrays(gl.TRIANGLES, 0, this.numTriangles * 3);
 	}
 	
 	// Esta función se llama para setear una textura sobre la malla
 	// El argumento es un componente <img> de html que contiene la textura. 
-	setTexture(img)
+	setTextures(textures)
 	{
-		//gl.activeTexture(gl.TEXTURE0+this.meshID);
-		gl.bindTexture(gl.TEXTURE_2D, this.texture);
-		gl.texImage2D(
-			gl.TEXTURE_2D,
-			0,
-			gl.RGB,
-			gl.RGB,
-			gl.UNSIGNED_BYTE,
-			img
-		);
-		gl.generateMipmap(gl.TEXTURE_2D);
+		this.textures = textures
 	}
-		
-        // Esta función se llama cada vez que el usuario cambia el estado del checkbox 'Mostrar textura'
-	// El argumento es un boleano que indica si el checkbox está tildado
-	showTexture(show)
-	{
-		gl.useProgram(this.prog);
 
-		if(show) 
-			gl.uniform1i(this.showTex, 1); 
-		else gl.uniform1i(this.showTex, 0); 
-	}
-	
 	// Este método se llama al actualizar la dirección de la luz desde la interfaz
 	setLightDir(x, y, z)
 	{			
@@ -196,8 +186,9 @@ var meshVS = `
 var meshFS = `
 	precision mediump float;
 	
-	uniform int showTex;
-	uniform sampler2D texGPU;
+	uniform int texID;
+	uniform sampler2D texFloor;
+	uniform sampler2D texWall;
 	uniform vec3 lightDir;
 	uniform float alpha;
 	uniform mat3 mn;
@@ -208,7 +199,10 @@ var meshFS = `
 
 	void main()
 	{	
-		gl_FragColor = texture2D(texGPU, texCoord);
+		if(texID == 0)
+			gl_FragColor = texture2D(texFloor, texCoord);
+		if(texID == 1)
+			gl_FragColor = texture2D(texWall, texCoord);
 
 		vec4 kd = gl_FragColor;
 		vec4 ks = vec4(1.0, 1.0, 1.0, 1.0);

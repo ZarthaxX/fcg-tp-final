@@ -262,8 +262,8 @@ class MazeGeometryMapper {
     
     convertMazeToGeometry(maze) {
         return [
-            this.generateWallsGeometry(maze),
             this.generateRoofGeometry(maze),
+            this.generateWallsGeometry(maze),
         ]
     }
 
@@ -287,8 +287,9 @@ class MazeGeometryMapper {
         normals.push(...meshNormals)
         textures.push(...meshTextures)
         
-        return function() {
-            meshWall.setMesh(triangles, textures, normals)
+        return function(matrixMVP, matrixMV, matrixNormal) {
+            meshDrawer.setMesh(triangles, textures, normals)
+            meshDrawer.draw(1, matrixMVP, matrixMV, matrixNormal)
         }
     }
 
@@ -306,8 +307,9 @@ class MazeGeometryMapper {
             }
         }
 
-        return function() {
-            meshFloor.setMesh(triangles, textures, normals)
+        return function(matrixMVP, matrixMV, matrixNormal) {
+            meshDrawer.setMesh(triangles, textures, normals)
+            meshDrawer.draw(0, matrixMVP, matrixMV, matrixNormal)
         }
     }
 

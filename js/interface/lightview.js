@@ -145,8 +145,7 @@ class LightView
 		var sy = Math.sin( this.rotY );
 		var cx = Math.cos( this.rotX );
 		var sx = Math.sin( this.rotX );
-		meshWall.setLightDir( -sy, cy*sx, -cy*cx );
-		meshFloor.setLightDir( -sy, cy*sx, -cy*cx );
+		meshDrawer.setLightDir( -sy, cy*sx, -cy*cx );
 		DrawScene();
 	}
 	
