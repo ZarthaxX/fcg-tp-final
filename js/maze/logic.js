@@ -34,7 +34,11 @@ var directions = [EAST, WEST, NORTH, SOUTH]
 
 class Wall {
     constructor(){}
-
+    
+    isDoor() {
+        return false
+    }
+    
     isWall(){
         return true
     }
@@ -72,6 +76,10 @@ class Wall {
 
 class Path {
     constructor(){}
+
+    isDoor() {
+        return false
+    }
 
     isWall(){
         return false
@@ -122,6 +130,10 @@ class Door {
         this.state = false
     }
 
+    isDoor() {
+        return true
+    }
+    
     isWall(){
         return false
     }
@@ -178,6 +190,10 @@ class Door {
 class Chest {
     constructor(){}
 
+    isDoor() {
+        return false
+    }
+    
     isWall(){
         return false
     }
@@ -255,6 +271,13 @@ class Maze{
         this.cells[entering.y][entering.x].changeState()
     }
 
+    isDoor(cell){
+        if (this.cellInBounds(cell)) {
+            return this.cells[cell.y][cell.x].isDoor()
+        }
+        return false
+    }
+    
     isWall(cell){
         if (this.cellInBounds(cell)) {
             return this.cells[cell.y][cell.x].isWall()
@@ -269,6 +292,13 @@ class Maze{
         return false
     }
     
+    isChest(cell){
+        if (this.cellInBounds(cell)) {
+            return this.cells[cell.y][cell.x].isChest()
+        }
+        return false
+    }
+
     setPath(cell){
         if (this.cellInBounds(cell)) {
             this.cells[cell.y][cell.x] = new Path()
