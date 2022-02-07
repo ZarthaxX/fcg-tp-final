@@ -1,11 +1,36 @@
 // Estructuras globales e inicializaciones
-var boxDrawer;          // clase para contener el comportamiento de la caja
 var meshDrawer;         // clase para contener el comportamiento de la malla
 var meshFloor;
 var canvas, gl;         // canvas y contexto WebGL
 var perspectiveMatrix;	// matriz de perspectiva
 
 var rotX=0, rotY=0, transZ=3, autorot=0;
+
+class Camera {
+
+	constructor() {
+		this.cameraPos = new Vertex3(0.0, 0.0, -10.0);
+		this.cameraFront = new Vertex3(0.0, 0.0, 1.0);
+		this.cameraUp = new Vertex3(0.0, 1.0, 0.0);
+		this.savedCamPosition = null;
+		this.savedCamFront = null;
+				
+	}
+
+	setPosition(pos) {
+		this.cameraPos = pos;
+	}
+
+	setFront(front) {
+		this.cameraFront = front;
+	}
+
+	setUpVector(up) {
+		this.cameraUp = up;
+	}
+}
+
+Camera = new Camera();
 
 var textures = [];
 
@@ -54,7 +79,6 @@ function InitWebGL()
 	gl.enable(gl.DEPTH_TEST); // habilitar test de profundidad 
 	
 	// Inicializar los shaders y buffers para renderizar	
-	boxDrawer  = new BoxDrawer();
 	meshDrawer = new MeshDrawer();
 	loadImages([floorTexture, wallTexture], (images) => {
 		// create 2 textures
@@ -76,6 +100,7 @@ function InitWebGL()
 		}
 		meshDrawer.setTextures(textures)
 	});
+
 	// Setear el tamaño del viewport
 	UpdateCanvasSize();
 }
@@ -105,13 +130,13 @@ function UpdateCanvasSize()
 }
 
 // Calcula la matriz de perspectiva (column-major)
-function ProjectionMatrix( c, z, fov_angle=60 )
+function ProjectionMatrix( c, z, fov_angle=5 )
 {
 	var r = c.width / c.height;
-	var n = (z - 1.74);
+	var n = (z - 2.56);
 	const min_n = 0.001;
 	if ( n < min_n ) n = min_n;
-	var f = (z + 1.74);;
+	var f = (z + 2.56);;
 	var fov = 3.145 * fov_angle / 180;
 	var s = 1 / Math.tan( fov/2 );
 	return [
@@ -129,10 +154,10 @@ function UpdateProjectionMatrix()
 }
 
 // Funcion que reenderiza la escena. 
-function DrawScene()
+function DrawScene(currentPos = new Point(0,0), width = 1, height = 1)
 {
 	// 1. Obtenemos las matrices de transformación 
-	var mv  = GetModelViewMatrix( 0, 0, transZ, rotX, autorot+rotY );
+	var mv  = GetModelViewMatrix( currentPos.x / width, currentPos.y / height, transZ, rotX, autorot+rotY );
 	var mvp = MatrixMult( perspectiveMatrix, mv );
 
 	// 2. Limpiamos la escena
@@ -146,9 +171,6 @@ function DrawScene()
 		mazeDrawers[i](mvp, mv, nrmTrans);
 	}
 
-	if ( showBox.checked ) {
-		boxDrawer.draw( mvp );
-	}
 }
 
 // Función que compila los shaders que se le pasan por parámetro (vertex & fragment shaders)

@@ -33,13 +33,13 @@ function checkKey(e) {
         updateMaze()
     }
     updateMazeGeometry()
-    DrawScene();
+    DrawScene(maze.player.point, maze.width, maze.height);
 }
 
 function updateMazeGeometry() {
     var mazeGeometryMapper = new MazeGeometryMapper()
     mazeDrawers = mazeGeometryMapper.convertMazeToGeometry(maze)
-    DrawScene()
+    DrawScene(maze.player.point, maze.width, maze.height)
 }
 
 function getRandomInt(min, max) {
@@ -50,8 +50,8 @@ function getRandomInt(min, max) {
 
 const MIN_WIDTH = 5;
 const MIN_HEIGHT = 7;
-const MAX_WIDTH = 5;
-const MAX_HEIGHT = 7;
+const MAX_WIDTH = 11;
+const MAX_HEIGHT = 13;
 
 function initGame() {   
     var width = getRandomInt(MIN_WIDTH, MAX_WIDTH)
@@ -74,7 +74,8 @@ function initGame() {
     maze = mazeGenerator.makeMaze(new Point(initialX, initialY))
     updateMaze()
     updateMazeGeometry()
-    DrawScene()
+    
+    DrawScene(maze.player.point, maze.width, maze.height)
 }
 
 function updateMaze(){

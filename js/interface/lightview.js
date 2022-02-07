@@ -21,7 +21,7 @@ class LightView
 		this.gl.clearColor(0.33,0.33,0.33,0);
 		this.gl.enable(gl.DEPTH_TEST);
 		
-		this.rotX = 0;
+		this.rotX = 7;
 		this.rotY = 0;
 		this.posZ = 5;
 		
