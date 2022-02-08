@@ -1,4 +1,4 @@
-const PROPORTION_FACTOR = 0.02;
+const PROPORTION_FACTOR = 1;
 
 class Vertex3 {
     constructor(x, y, z){
@@ -205,8 +205,8 @@ class GeometryObject {
 
     toMesh() {
         return [
-            this.vertices.reduce((acc, v) => acc.concat([v.x,v.y,v.z]), []), 
-            this.normals.reduce((acc, v) => acc.concat([v.x,v.y,v.z]), []),
+            this.vertices.reduce((acc, v) => acc.concat([-v.x,v.y,-v.z]), []), 
+            this.normals.reduce((acc, v) => acc.concat([-v.x,v.y,-v.z]), []),
             this.textures
         ]
     }

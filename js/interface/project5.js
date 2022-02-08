@@ -12,9 +12,9 @@ var rotX=0, rotY=0, transZ=3, autorot=0;
 class Camera {
 
 	constructor() {
-		this.cameraPos = new Vertex3(0.0, 0.0, 1.0);
-		this.cameraFront = new Vertex3(0.0, 0.0, 1.0);
-		this.cameraUp = new Vertex3(0.0, 1.0, 0.0);
+		this.cameraPos = new Vertex3(-30.0, 0.0, 0.0);
+		this.cameraFront = new Vertex3(0.0, 0.0, -1.0);
+		this.cameraUp = new Vertex3(0.0, -1.0, 0.0);
 	}
 
 	setPosition(pos) {
@@ -135,7 +135,7 @@ function UpdateCanvasSize()
 }
 
 // Calcula la matriz de perspectiva (column-major)
-function ProjectionMatrix( c, fov_angle=5 )
+function ProjectionMatrix( c, fov_angle=55 )
 {
 	var r = c.width / c.height;
 	var n = 0.1;
@@ -167,9 +167,9 @@ function DrawScene()
 	currentPos = maze.player.point
 	currentDir = maze.player.direction
 	// 1. Obtenemos las matrices de transformación 
-	camera.setPosition(new Vertex3(currentPos.x-1, currentPos.y-1,0));
+	camera.setPosition(new Vertex3(currentPos.x*2, currentPos.y*2,-15));
 	cameraMatrix = getCameraMatrix(camera.cameraPos, camera.cameraPos.traslation(camera.cameraFront) , camera.cameraUp);
-	var mv  = GetModelViewMatrix( 0, 0, transZ, rotX, autorot+rotY );
+	var mv  = GetModelViewMatrix( 0,0, transZ, rotX, autorot+rotY );
 	var view = MatrixMult(cameraMatrix, mv)
 	var mvp = MatrixMult( perspectiveMatrix, view);
 
@@ -290,8 +290,8 @@ window.onload = function()
 			// Si se mueve el mouse, actualizo las matrices de rotación
 			canvas.onmousemove = function() 
 			{
-				rotY += (cx - event.clientX)/canvas.width*5;
-				rotX += (cy - event.clientY)/canvas.height*5;
+				rotY += (camera.cameraPos.x - event.clientX)/canvas.width*0.1;
+				rotX += (camera.cameraPos.y - event.clientY)/canvas.height*0.1;
 				cx = event.clientX;
 				cy = event.clientY;
 				UpdateProjectionMatrix();

@@ -11,26 +11,26 @@ function checkKey(e) {
     var cameraSpeed = 0.1;
 
     if (e.keyCode == '38') {
-        camera.setPosition(camera.cameraPos.traslation(camera.cameraFront.scalar(cameraSpeed)))
         maze.movePlayer(NORTH)
+        camera.setPosition(camera.cameraPos.traslation(camera.cameraFront.scalar(cameraSpeed)))
         updateMaze()
         // up arrow
     }
     else if (e.keyCode == '40') {
-        camera.setPosition(camera.cameraPos.minus(camera.cameraFront.scalar(cameraSpeed)))
         maze.movePlayer(SOUTH)
+        camera.setPosition(camera.cameraPos.minus(camera.cameraFront.scalar(cameraSpeed)))
         updateMaze()
         // down arrow
     }
     else if (e.keyCode == '37') {
-        camera.setPosition(camera.cameraPos.traslation(camera.cameraFront.cross(camera.cameraUp).scalar(cameraSpeed)));
         maze.movePlayer(WEST)
+        camera.setPosition(camera.cameraPos.traslation(camera.cameraFront.cross(camera.cameraUp).scalar(cameraSpeed)));
         updateMaze()
        // left arrow
     }
     else if (e.keyCode == '39') {
-        camera.setPosition(camera.cameraPos.minus(camera.cameraFront.cross(camera.cameraUp).scalar(cameraSpeed)));
         maze.movePlayer(EAST)
+        camera.setPosition(camera.cameraPos.minus(camera.cameraFront.cross(camera.cameraUp).scalar(cameraSpeed)));
         updateMaze()
        // right arrow
     } else if (e.keyCode == '32') {
