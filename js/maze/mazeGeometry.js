@@ -264,8 +264,9 @@ class MazeGeometryMapper {
         return [
             this.generateRoofGeometry(maze),
             this.generateWallsGeometry(maze),
-            this.generateDoorsGeometry(maze),
+            this.generateClosedDoorsGeometry(maze),
             this.generatePortalGeometry(maze),
+            this.generateOpenDoorsGeometry(maze),
         ]
     }
 
@@ -297,14 +298,14 @@ class MazeGeometryMapper {
         }
     }
 
-    generateDoorsGeometry(maze) {
+    generateClosedDoorsGeometry(maze) {
         var triangles = []
         var normals = []
         var textures = []
         for(var y = 0; y < maze.height; y++){
             for(var x = 0; x < maze.width; x++){
                 var offset = new Vertex3(x*2, y*2, 0).scalar(PROPORTION_FACTOR)
-                if(maze.isDoor(new Point(x, y))){
+                if(maze.isDoor(new Point(x, y)) && !maze.cells[y][x].isOpen()){
                     var [meshTriangles, meshNormals, meshTextures] = maze.cells[y][x].toGeometry(this).translate(offset).toMesh()
                     triangles.push(...meshTriangles)
                     normals.push(...meshNormals)
@@ -316,6 +317,28 @@ class MazeGeometryMapper {
         return function(matrixMVP, matrixMV, matrixNormal) {
             meshDrawer.setMesh(triangles, textures, normals)
             meshDrawer.draw(2, matrixMVP, matrixMV, matrixNormal)
+        }
+    }
+
+    generateOpenDoorsGeometry(maze) {
+        var triangles = []
+        var normals = []
+        var textures = []
+        for(var y = 0; y < maze.height; y++){
+            for(var x = 0; x < maze.width; x++){
+                var offset = new Vertex3(x*2, y*2, 0).scalar(PROPORTION_FACTOR)
+                if(maze.isDoor(new Point(x, y)) && maze.cells[y][x].isOpen()){
+                    var [meshTriangles, meshNormals, meshTextures] = maze.cells[y][x].toGeometry(this).translate(offset).toMesh()
+                    triangles.push(...meshTriangles)
+                    normals.push(...meshNormals)
+                    textures.push(...meshTextures)
+                }
+            }
+        }
+
+        return function(matrixMVP, matrixMV, matrixNormal) {
+            meshDrawer.setMesh(triangles, textures, normals)
+            meshDrawer.draw(4, matrixMVP, matrixMV, matrixNormal)
         }
     }
 
@@ -370,8 +393,6 @@ class MazeGeometryMapper {
     }
 
     mapToDoor(door) {
-        if(door.state)
-            return nullGeometry.copy()
         return doorsGeometry[door.direction].copy()
     }
 

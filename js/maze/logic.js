@@ -122,6 +122,10 @@ class Door {
         this.state = false
     }
 
+    isOpen() {
+        return this.state
+    }
+    
     open(){
         this.state = true
     }

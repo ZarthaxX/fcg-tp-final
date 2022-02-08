@@ -31,6 +31,31 @@ function GetModelViewMatrix(translationX, translationY, translationZ, rotationX,
 	return mvp;
 }
 
+function getCameraMatrix(position, target, worldUp) {
+
+	var P = position;
+	var D = target.minus(P).normalize();
+	var R = worldUp.cross(D).normalize();
+	var U = D.cross(R).normalize();
+	
+	//Column-Major
+	var left = [
+		R.x, U.x, D.x, 0,
+		R.y, U.y, D.y, 0,
+		R.z, U.z, D.z, 0,
+		0, 0, 0, 1
+	];
+
+	var right = [
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		-P.x, -P.y, -P.z, 1
+	];
+
+	return MatrixMult(left, right);
+}
+
 // [COMPLETAR] Completar la implementación de esta clase.
 class MeshDrawer
 {
@@ -193,6 +218,9 @@ var meshFS = `
 	void main()
 	{	
 		gl_FragColor = texture2D(texGPU, texCoord);
+		
+		if(gl_FragColor.a < 0.5)
+			discard;
 
 		vec4 kd = gl_FragColor;
 		vec4 ks = vec4(1.0, 1.0, 1.0, 1.0);

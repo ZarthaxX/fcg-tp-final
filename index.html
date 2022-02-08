@@ -18,7 +18,8 @@
     <script type="text/javascript" id="includedscript" src="js/maze/mazeGeometry.js"></script>
     <script type="text/javascript" id="includedscript" src="js/textures/wall.js"></script>
     <script type="text/javascript" id="includedscript" src="js/textures/floor.js"></script>
-    <script type="text/javascript" id="includedscript" src="js/textures/door.js"></script>
+    <script type="text/javascript" id="includedscript" src="js/textures/opendoor.js"></script>
+    <script type="text/javascript" id="includedscript" src="js/textures/closeddoor.js"></script>
     <script type="text/javascript" id="includedscript" src="js/textures/portal.js"></script>
     <script type="text/javascript" src="js/interface/objmesh.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
@@ -31,7 +32,6 @@
         <div id="controls">
             <div class="control-group"><canvas id="lightcontrol"></canvas><div id="lightcontrol-label">Dirección de la Luz</div></div>
             <div class="control-group">
-                <div class="control"><input id="show-box" name="show-box" type="checkbox" onchange="DrawScene()" checked /><label for="show-box"> Mostrar caja</label></div>
                 <div class="control"><span id="shininess-label">Intensidad:</span><span id="shininess-value">1</span><input id="shininess-exp" type="range" min="0" max="100" value="50" oninput="SetShininess(this)"/></div>
             </div>
             <div class="control-group">

@@ -8,23 +8,28 @@ var mazeDrawers
 function checkKey(e) {
 
     e = e || window.event;
+    var cameraSpeed = 0.1;
 
     if (e.keyCode == '38') {
+        camera.setPosition(camera.cameraPos.traslation(camera.cameraFront.scalar(cameraSpeed)))
         maze.movePlayer(NORTH)
         updateMaze()
         // up arrow
     }
     else if (e.keyCode == '40') {
+        camera.setPosition(camera.cameraPos.minus(camera.cameraFront.scalar(cameraSpeed)))
         maze.movePlayer(SOUTH)
         updateMaze()
         // down arrow
     }
     else if (e.keyCode == '37') {
+        camera.setPosition(camera.cameraPos.traslation(camera.cameraFront.cross(camera.cameraUp).scalar(cameraSpeed)));
         maze.movePlayer(WEST)
         updateMaze()
        // left arrow
     }
     else if (e.keyCode == '39') {
+        camera.setPosition(camera.cameraPos.minus(camera.cameraFront.cross(camera.cameraUp).scalar(cameraSpeed)));
         maze.movePlayer(EAST)
         updateMaze()
        // right arrow
@@ -33,13 +38,13 @@ function checkKey(e) {
         updateMaze()
     }
     updateMazeGeometry()
-    DrawScene(maze.player.point, maze.width, maze.height);
+    DrawScene();
 }
 
 function updateMazeGeometry() {
     var mazeGeometryMapper = new MazeGeometryMapper()
     mazeDrawers = mazeGeometryMapper.convertMazeToGeometry(maze)
-    DrawScene(maze.player.point, maze.width, maze.height)
+    DrawScene()
 }
 
 function getRandomInt(min, max) {
@@ -78,7 +83,7 @@ function initGame() {
     updateMaze()
     updateMazeGeometry()
     
-    DrawScene(maze.player.point, maze.width, maze.height)
+    DrawScene()
 }
 
 function updateMaze(){

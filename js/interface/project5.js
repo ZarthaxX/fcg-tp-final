@@ -3,18 +3,18 @@ var meshDrawer;         // clase para contener el comportamiento de la malla
 var meshFloor;
 var canvas, gl;         // canvas y contexto WebGL
 var perspectiveMatrix;	// matriz de perspectiva
+var camera;
+
+var directionToDegrees = {}
 
 var rotX=0, rotY=0, transZ=3, autorot=0;
 
 class Camera {
 
 	constructor() {
-		this.cameraPos = new Vertex3(0.0, 0.0, -10.0);
+		this.cameraPos = new Vertex3(0.0, 0.0, 1.0);
 		this.cameraFront = new Vertex3(0.0, 0.0, 1.0);
 		this.cameraUp = new Vertex3(0.0, 1.0, 0.0);
-		this.savedCamPosition = null;
-		this.savedCamFront = null;
-				
 	}
 
 	setPosition(pos) {
@@ -29,8 +29,6 @@ class Camera {
 		this.cameraUp = up;
 	}
 }
-
-Camera = new Camera();
 
 var textures = [];
 
@@ -64,6 +62,13 @@ function loadImage(url, callback) {
 // Funcion de inicialización, se llama al cargar la página
 function InitWebGL()
 {
+	camera = new Camera();
+	
+	directionToDegrees[WEST] = 0
+	directionToDegrees[NORTH] = 90
+	directionToDegrees[EAST] = 180
+	directionToDegrees[SOUTH] = 270
+	
 	// Inicializamos el canvas WebGL
 	canvas = document.getElementById("canvas");
 	canvas.oncontextmenu = function() {return false;};
@@ -80,7 +85,7 @@ function InitWebGL()
 	
 	// Inicializar los shaders y buffers para renderizar	
 	meshDrawer = new MeshDrawer();
-	loadImages([floorTexture, wallTexture, doorTexture, portalTexture], (images) => {
+	loadImages([floorTexture, wallTexture, closedDoorTexture, portalTexture, openDoorTexture], (images) => {
 		// create 2 textures
 		for (var ii = 0; ii < images.length; ii++) {
 			var texture = gl.createTexture();
@@ -130,15 +135,14 @@ function UpdateCanvasSize()
 }
 
 // Calcula la matriz de perspectiva (column-major)
-function ProjectionMatrix( c, z, fov_angle=5 )
+function ProjectionMatrix( c, fov_angle=5 )
 {
 	var r = c.width / c.height;
-	var n = (z - 2.56);
-	const min_n = 0.001;
-	if ( n < min_n ) n = min_n;
-	var f = (z + 2.56);;
+	var n = 0.1;
+	var f = 100;
 	var fov = 3.145 * fov_angle / 180;
 	var s = 1 / Math.tan( fov/2 );
+	
 	return [
 		s/r, 0, 0, 0,
 		0, s, 0, 0,
@@ -154,11 +158,20 @@ function UpdateProjectionMatrix()
 }
 
 // Funcion que reenderiza la escena. 
-function DrawScene(currentPos = new Point(0,0), width = 1, height = 1)
+function DrawScene()
 {
+	if(maze == undefined)
+		return
+	width = maze.width
+	height = maze.height
+	currentPos = maze.player.point
+	currentDir = maze.player.direction
 	// 1. Obtenemos las matrices de transformación 
-	var mv  = GetModelViewMatrix( currentPos.x / width, currentPos.y / height, transZ, rotX, autorot+rotY );
-	var mvp = MatrixMult( perspectiveMatrix, mv );
+	camera.setPosition(new Vertex3(currentPos.x-1, currentPos.y-1,0));
+	cameraMatrix = getCameraMatrix(camera.cameraPos, camera.cameraPos.traslation(camera.cameraFront) , camera.cameraUp);
+	var mv  = GetModelViewMatrix( 0, 0, transZ, rotX, autorot+rotY );
+	var view = MatrixMult(cameraMatrix, mv)
+	var mvp = MatrixMult( perspectiveMatrix, view);
 
 	// 2. Limpiamos la escena
 	gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
