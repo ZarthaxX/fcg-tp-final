@@ -248,6 +248,10 @@ const chestGeometry = new GeometryObjectData()
     .withScale(0.5)
     .toGeometryObject();
 
+const playerGeometry = new GeometryObjectData()
+    .withFaces(["BACK"])
+    .withScale(0.5)
+    .toGeometryObject();
 
 class MeshDrawerData {
     constructor(triangles, normals, textures){
@@ -267,18 +271,23 @@ class MazeGeometryMapper {
             this.generateClosedDoorsGeometry(maze),
             this.generatePortalGeometry(maze),
             this.generateOpenDoorsGeometry(maze),
+            this.generatePlayerGeometry(maze),
         ]
     }
 
-    generateWallsGeometry(maze) {
+    generateOffset(maze, x, y) {
+        return new Vertex3(x*2 - maze.player.point.x*2, y*2 - maze.player.point.y*2, 0).scalar(PROPORTION_FACTOR)
+    }
+
+    generateGeometry(texID, maze, geoSource, entityApplies) {
         var triangles = []
         var normals = []
         var textures = []
         for(var y = 0; y < maze.height; y++){
             for(var x = 0; x < maze.width; x++){
-                var offset = new Vertex3(x*2, y*2, 0).scalar(PROPORTION_FACTOR)
-                if(maze.isWall(new Point(x, y))){
-                    var [meshTriangles, meshNormals, meshTextures] = maze.cells[y][x].toGeometry(this).translate(offset).toMesh()
+                var offset = this.generateOffset(maze, x,y)
+                if(entityApplies(maze, x, y)){
+                    var [meshTriangles, meshNormals, meshTextures] = geoSource(maze, x, y).translate(offset).toMesh()
                     triangles.push(...meshTriangles)
                     normals.push(...meshNormals)
                     textures.push(...meshTextures)
@@ -286,102 +295,47 @@ class MazeGeometryMapper {
             }
         }
         
-        var offset = new Vertex3(maze.player.point.x*2, maze.player.point.y*2, 0).scalar(PROPORTION_FACTOR)
-        var [meshTriangles, meshNormals, meshTextures] = chestGeometry.copy().translate(offset).toMesh()
-        triangles.push(...meshTriangles)
-        normals.push(...meshNormals)
-        textures.push(...meshTextures)
-        
         return function(matrixMVP, matrixMV, matrixNormal) {
-            meshDrawer.setMesh(triangles, textures, normals)
-            meshDrawer.draw(1, matrixMVP, matrixMV, matrixNormal)
+            if(triangles.length != 0){
+                meshDrawer.setMesh(triangles, textures, normals)
+                meshDrawer.draw(texID, matrixMVP, matrixMV, matrixNormal)
+            }
         }
+    }
+
+    generateGeometryDrawer(texID, triangles, textures, normals) {
+        return function(matrixMVP, matrixMV, matrixNormal) {
+            if(triangles.length != 0){
+                meshDrawer.setMesh(triangles, textures, normals)
+                meshDrawer.draw(texID, matrixMVP, matrixMV, matrixNormal)
+            }
+        }
+    }
+
+    generateWallsGeometry(maze) {
+        return this.generateGeometry(1, maze, (m, x, y) => m.cells[y][x].toGeometry(this), (m, x, y) => m.isWall(new Point(x, y)))
+    }
+
+    generatePlayerGeometry(maze) {
+        var offset = this.generateOffset(maze, maze.player.point.x, maze.player.point.y)
+        var [triangles, normals, textures] = playerGeometry.copy().translate(offset).toMesh()
+        return this.generateGeometryDrawer(3, triangles, textures, normals)
     }
 
     generateClosedDoorsGeometry(maze) {
-        var triangles = []
-        var normals = []
-        var textures = []
-        for(var y = 0; y < maze.height; y++){
-            for(var x = 0; x < maze.width; x++){
-                var offset = new Vertex3(x*2, y*2, 0).scalar(PROPORTION_FACTOR)
-                if(maze.isDoor(new Point(x, y)) && !maze.cells[y][x].isOpen()){
-                    var [meshTriangles, meshNormals, meshTextures] = maze.cells[y][x].toGeometry(this).translate(offset).toMesh()
-                    triangles.push(...meshTriangles)
-                    normals.push(...meshNormals)
-                    textures.push(...meshTextures)
-                }
-            }
-        }
-
-        return function(matrixMVP, matrixMV, matrixNormal) {
-            meshDrawer.setMesh(triangles, textures, normals)
-            meshDrawer.draw(2, matrixMVP, matrixMV, matrixNormal)
-        }
+        return this.generateGeometry(2, maze, (m, x, y) => m.cells[y][x].toGeometry(this), (m, x, y) => m.isDoor(new Point(x, y)) && !m.cells[y][x].isOpen())
     }
 
     generateOpenDoorsGeometry(maze) {
-        var triangles = []
-        var normals = []
-        var textures = []
-        for(var y = 0; y < maze.height; y++){
-            for(var x = 0; x < maze.width; x++){
-                var offset = new Vertex3(x*2, y*2, 0).scalar(PROPORTION_FACTOR)
-                if(maze.isDoor(new Point(x, y)) && maze.cells[y][x].isOpen()){
-                    var [meshTriangles, meshNormals, meshTextures] = maze.cells[y][x].toGeometry(this).translate(offset).toMesh()
-                    triangles.push(...meshTriangles)
-                    normals.push(...meshNormals)
-                    textures.push(...meshTextures)
-                }
-            }
-        }
-
-        return function(matrixMVP, matrixMV, matrixNormal) {
-            meshDrawer.setMesh(triangles, textures, normals)
-            meshDrawer.draw(4, matrixMVP, matrixMV, matrixNormal)
-        }
+        return this.generateGeometry(4, maze, (m, x, y) => m.cells[y][x].toGeometry(this), (m, x, y) => m.isDoor(new Point(x, y)) && m.cells[y][x].isOpen())
     }
 
     generateRoofGeometry(maze) {
-        var triangles = []
-        var normals = []
-        var textures = []
-        for(var y = 0; y < maze.height; y++){
-            for(var x = 0; x < maze.width; x++){
-                var offset = new Vertex3(x*2, y*2, 0).scalar(PROPORTION_FACTOR)
-                var [meshTriangles, meshNormals, meshTextures] = pathGeometry.copy().translate(offset).toMesh()
-                triangles.push(...meshTriangles)
-                normals.push(...meshNormals)
-                textures.push(...meshTextures)
-            }
-        }
-
-        return function(matrixMVP, matrixMV, matrixNormal) {
-            meshDrawer.setMesh(triangles, textures, normals)
-            meshDrawer.draw(0, matrixMVP, matrixMV, matrixNormal)
-        }
+        return this.generateGeometry(0, maze, (m, x, y) => pathGeometry.copy(), (m, x, y) => true)
     }
 
     generatePortalGeometry(maze) {
-        var triangles = []
-        var normals = []
-        var textures = []
-        for(var y = 0; y < maze.height; y++){
-            for(var x = 0; x < maze.width; x++){
-                var offset = new Vertex3(x*2, y*2, 0).scalar(PROPORTION_FACTOR)
-                if(maze.isChest(new Point(x, y))){
-                    var [meshTriangles, meshNormals, meshTextures] = maze.cells[y][x].toGeometry(this).translate(offset).toMesh()
-                    triangles.push(...meshTriangles)
-                    normals.push(...meshNormals)
-                    textures.push(...meshTextures)
-                }
-            }
-        }
-        
-        return function(matrixMVP, matrixMV, matrixNormal) {
-            meshDrawer.setMesh(triangles, textures, normals)
-            meshDrawer.draw(3, matrixMVP, matrixMV, matrixNormal)
-        }
+        return this.generateGeometry(3, maze, (m, x, y) => m.cells[y][x].toGeometry(this), (m, x, y) => m.isChest(new Point(x, y)))
     }
 
     mapToWall(wall) {

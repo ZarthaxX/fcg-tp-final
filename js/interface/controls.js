@@ -1,5 +1,4 @@
 document.onkeydown = checkKey;
-window.addEventListener("load", initGame);
 
 var maze
 var mazeGeometry
@@ -44,7 +43,6 @@ function checkKey(e) {
 function updateMazeGeometry() {
     var mazeGeometryMapper = new MazeGeometryMapper()
     mazeDrawers = mazeGeometryMapper.convertMazeToGeometry(maze)
-    DrawScene()
 }
 
 function getRandomInt(min, max) {
@@ -82,8 +80,6 @@ function initGame() {
     maze = mazeGenerator.makeMaze(new Point(initialX, initialY))
     updateMaze()
     updateMazeGeometry()
-    
-    DrawScene()
 }
 
 function updateMaze(){

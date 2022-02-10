@@ -4,10 +4,12 @@ var meshFloor;
 var canvas, gl;         // canvas y contexto WebGL
 var perspectiveMatrix;	// matriz de perspectiva
 var camera;
+var yaw = 90;
+var pitch = 0;
 
 var directionToDegrees = {}
 
-var rotX=0, rotY=0, transZ=3, autorot=0;
+var rotX=0, rotY=0, transZ=1, autorot=0;
 
 class Camera {
 
@@ -104,10 +106,12 @@ function InitWebGL()
 			textures.push(texture);
 		}
 		meshDrawer.setTextures(textures)
+		// Setear el tamaño del viewport
+		UpdateCanvasSize();
+		initGame();
+		DrawScene();
 	});
 
-	// Setear el tamaño del viewport
-	UpdateCanvasSize();
 }
 
 // Funcion para actualizar el tamaño de la ventana cada vez que se hace resize
@@ -135,7 +139,7 @@ function UpdateCanvasSize()
 }
 
 // Calcula la matriz de perspectiva (column-major)
-function ProjectionMatrix( c, fov_angle=55 )
+function ProjectionMatrix( c, fov_angle=20 )
 {
 	var r = c.width / c.height;
 	var n = 0.1;
@@ -167,8 +171,8 @@ function DrawScene()
 	currentPos = maze.player.point
 	currentDir = maze.player.direction
 	// 1. Obtenemos las matrices de transformación 
-	camera.setPosition(new Vertex3(currentPos.x*2, currentPos.y*2,-15));
-	cameraMatrix = getCameraMatrix(camera.cameraPos, camera.cameraPos.traslation(camera.cameraFront) , camera.cameraUp);
+	camera.setPosition(new Vertex3(0, 0, -1));
+	cameraMatrix = getCameraMatrix(camera.cameraPos, camera.cameraFront.traslation(camera.cameraPos) , camera.cameraUp);
 	var mv  = GetModelViewMatrix( 0,0, transZ, rotX, autorot+rotY );
 	var view = MatrixMult(cameraMatrix, mv)
 	var mvp = MatrixMult( perspectiveMatrix, view);
@@ -178,7 +182,6 @@ function DrawScene()
 	
 	// 3. Le pedimos a cada objeto que se dibuje a si mismo
 	var nrmTrans = [ mv[0],mv[1],mv[2], mv[4],mv[5],mv[6], mv[8],mv[9],mv[10] ];
-	console.log(mazeDrawers)
 	if(mazeDrawers != undefined)
 	for(var i = 0; i < mazeDrawers.length; i++) {
 		mazeDrawers[i](mvp, mv, nrmTrans);
@@ -266,14 +269,14 @@ window.onload = function()
 	// Evento de zoom (ruedita)
 	canvas.zoom = function( s ) 
 	{
-		transZ *= s/canvas.height + 1;
+		transZ *= s/canvas.height + 1.3;
 		UpdateProjectionMatrix();
 		DrawScene();
 	}
 	canvas.onwheel = function() { canvas.zoom(0.3*event.deltaY); }
 
 	// Evento de click 
-	canvas.onmousedown = function() 
+ 	canvas.onmousedown = function() 
 	{
 		var cx = event.clientX;
 		var cy = event.clientY;
@@ -290,23 +293,69 @@ window.onload = function()
 			// Si se mueve el mouse, actualizo las matrices de rotación
 			canvas.onmousemove = function() 
 			{
-				rotY += (camera.cameraPos.x - event.clientX)/canvas.width*0.1;
-				rotX += (camera.cameraPos.y - event.clientY)/canvas.height*0.1;
+				rotY += (cx - event.clientX)/canvas.width*2.2;
+				rotX += (cy - event.clientY)/canvas.height*2.2;
 				cx = event.clientX;
 				cy = event.clientY;
 				UpdateProjectionMatrix();
 				DrawScene();
-			}
+			} 
 		}
-	}
+	} 
 
 	// Evento soltar el mouse
 	canvas.onmouseup = canvas.onmouseleave = function() 
 	{
 		canvas.onmousemove = null;
 	}
-	
+
+	// Checks if mouse is down.
+	var mouseDown = 0;
+
+	document.body.onmousedown = function() {
+		if(mouseDown == 0){
+			mouseDown = 1;
+		}
+	}
+	document.body.onmouseup = function() {
+		if(mouseDown == 1){
+			mouseDown = 0;
+		}
+	}
+
 	SetShininess( document.getElementById('shininess-exp') );
+
+	/*var isOnDiv = false;
+	document.getElementById("controls").addEventListener("mouseenter", function(  ) {
+		isOnDiv=true;
+	});
+	document.getElementById("controls").addEventListener("mouseout", function(  ) {
+		isOnDiv=false;
+	});
+	
+
+	document.addEventListener('mousemove', (event) => {
+		mouseSensitivity = 0.05;
+		xoffset = event.movementX * mouseSensitivity;
+		yoffset = event.movementY * mouseSensitivity;
+		
+		if(mouseDown && !isOnDiv){
+
+			yaw += xoffset;
+			pitch += yoffset;
+
+			var direction = new Vertex3(directionsVec[maze.player.direction].x, directionsVec[maze.player.direction].y,0);
+			yaw_radians = yaw * (Math.PI / 180);
+			pitch_radians = pitch * (Math.PI / 180);
+
+			direction.x = Math.cos(yaw_radians) * Math.cos(pitch_radians);
+			direction.y = Math.sin(pitch_radians);
+			direction.z = -Math.sin(yaw_radians) * Math.cos(pitch_radians);
+			camera.setFront(direction.normalize());
+			UpdateProjectionMatrix();
+			DrawScene();
+		}
+	});*/
 	
 };
 
