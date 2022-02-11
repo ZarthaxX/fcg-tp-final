@@ -6,17 +6,17 @@ var perspectiveMatrix;	// matriz de perspectiva
 var camera;
 var yaw = 90;
 var pitch = 0;
-
+var upperViewEnabled = false;
 var directionToDegrees = {}
 
-var rotX=0, rotY=0, transZ=1, autorot=0;
+var rotX=0, rotY=0, transZ=0.2, autorot=0;
 
 class Camera {
 
 	constructor() {
-		this.cameraPos = new Vertex3(-30.0, 0.0, 0.0);
-		this.cameraFront = new Vertex3(0.0, 0.0, -1.0);
-		this.cameraUp = new Vertex3(0.0, -1.0, 0.0);
+		this.cameraPos = new Vertex3(0.0, 0.0, 0.0);
+		this.cameraFront = new Vertex3(0.0, 1.0, 0.0);
+		this.cameraUp = new Vertex3(0.0, 0.0, -1.0);
 	}
 
 	setPosition(pos) {
@@ -139,8 +139,9 @@ function UpdateCanvasSize()
 }
 
 // Calcula la matriz de perspectiva (column-major)
-function ProjectionMatrix( c, fov_angle=20 )
+function ProjectionMatrix( c, fov_angle=55 )
 {
+	fov_angle = 100.0
 	var r = c.width / c.height;
 	var n = 0.1;
 	var f = 100;
@@ -161,6 +162,11 @@ function UpdateProjectionMatrix()
 	perspectiveMatrix = ProjectionMatrix( canvas, transZ );
 }
 
+function setUpperView(item){
+	upperViewEnabled = item.checked;
+	if(!upperViewEnabled) transZ = 0.2
+	DrawScene();
+}
 // Funcion que reenderiza la escena. 
 function DrawScene()
 {
@@ -171,11 +177,18 @@ function DrawScene()
 	currentPos = maze.player.point
 	currentDir = maze.player.direction
 	// 1. Obtenemos las matrices de transformación 
-	camera.setPosition(new Vertex3(0, 0, -1));
+	camera.setPosition(new Vertex3(0, 0, 0));
 	cameraMatrix = getCameraMatrix(camera.cameraPos, camera.cameraFront.traslation(camera.cameraPos) , camera.cameraUp);
 	var mv  = GetModelViewMatrix( 0,0, transZ, rotX, autorot+rotY );
 	var view = MatrixMult(cameraMatrix, mv)
-	var mvp = MatrixMult( perspectiveMatrix, view);
+	var mvp
+	if(upperViewEnabled){
+		mvp = MatrixMult( perspectiveMatrix, mv);
+	}else {
+		mvp = MatrixMult( perspectiveMatrix, view);
+	}
+
+
 
 	// 2. Limpiamos la escena
 	gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
@@ -187,6 +200,10 @@ function DrawScene()
 		mazeDrawers[i](mvp, mv, nrmTrans);
 	}
 
+}
+
+function UseLight(param) {
+	meshDrawer.useLight( param.checked );
 }
 
 // Función que compila los shaders que se le pasan por parámetro (vertex & fragment shaders)
@@ -269,14 +286,14 @@ window.onload = function()
 	// Evento de zoom (ruedita)
 	canvas.zoom = function( s ) 
 	{
-		transZ *= s/canvas.height + 1.3;
+		if(upperViewEnabled) transZ *= s/canvas.height + 1.0;
 		UpdateProjectionMatrix();
 		DrawScene();
 	}
 	canvas.onwheel = function() { canvas.zoom(0.3*event.deltaY); }
 
 	// Evento de click 
- 	canvas.onmousedown = function() 
+ 	/*canvas.onmousedown = function() 
 	{
 		var cx = event.clientX;
 		var cy = event.clientY;
@@ -301,7 +318,7 @@ window.onload = function()
 				DrawScene();
 			} 
 		}
-	} 
+	} */
 
 	// Evento soltar el mouse
 	canvas.onmouseup = canvas.onmouseleave = function() 
@@ -325,7 +342,7 @@ window.onload = function()
 
 	SetShininess( document.getElementById('shininess-exp') );
 
-	/*var isOnDiv = false;
+	var isOnDiv = false;
 	document.getElementById("controls").addEventListener("mouseenter", function(  ) {
 		isOnDiv=true;
 	});
@@ -349,13 +366,13 @@ window.onload = function()
 			pitch_radians = pitch * (Math.PI / 180);
 
 			direction.x = Math.cos(yaw_radians) * Math.cos(pitch_radians);
-			direction.y = Math.sin(pitch_radians);
-			direction.z = -Math.sin(yaw_radians) * Math.cos(pitch_radians);
+			direction.y = Math.sin(yaw_radians) * Math.cos(pitch_radians);
+			direction.z = - Math.sin(pitch_radians);
 			camera.setFront(direction.normalize());
 			UpdateProjectionMatrix();
 			DrawScene();
 		}
-	});*/
+	});
 	
 };
 

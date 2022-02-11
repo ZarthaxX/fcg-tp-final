@@ -164,7 +164,12 @@ class MeshDrawer
 		gl.useProgram(this.prog);
 		gl.uniform3f(this.lightDir, x, y, z);
 	}
+	
+	useLight(value) 
+	{
 		
+	}
+
 	// Este método se llama al actualizar el brillo del material 
 	setShininess(shininess)
 	{				
@@ -230,10 +235,6 @@ var meshFS = `
 		vec3 h = normalize(v + l);
 		float cosTheta = dot(n, l);
 		float cosOmega = dot(n, h);
-		gl_FragColor =  
-			vec4(1.0, 1.0, 1.0, 1.0) *
-			max(0.0, cosTheta) *
-			(kd + (ks * pow(max(0.0, cosOmega), alpha) / cosTheta));
 		gl_FragColor.w = 1.0;
 	}
 `;
