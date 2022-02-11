@@ -4,31 +4,75 @@ var maze
 var mazeGeometry
 var mazeDrawers
 
+var dirToVec = {
+    "S" : {"x": 0,"y":-1},
+    "N" : {"x": 0,"y":1},
+    "E" : {"x": -1,"y":0},
+    "W" : {"x": 1,"y":0},
+}
+
+var dirToInt = {
+    "N" : 0,
+    "W" : 1,
+    "S" : 2,
+    "E" : 3,
+}
+
+var intToDir = {
+    0 : "N",
+    1 : "W",
+    2 : "S",
+    3 : "E",
+}
+
+function findAngle(x1,y1,x2,y2) {
+    dot = x1*x2 + y1*y2      
+    det = x1*y2 - y1*x2     
+    angle = Math.atan2(det, dot)
+    return angle
+}
+
+function getDir(dir) {
+    var closestDir = "N"
+    var closestDist = 10000
+    for(const d of ["S","N","E","W"]){
+        var vec = dirToVec[d]
+        var dist = findAngle(direction.x,direction.y,vec.x,vec.y)
+        if(Math.abs(dist) < closestDist){
+            closestDir = d
+            closestDist = Math.abs(dist)
+        }
+    }
+    offset = (dirToInt[dir] - dirToInt[closestDir] + 4) % 4
+    return intToDir[offset]
+}
+
+
 function checkKey(e) {
 
     e = e || window.event;
     var cameraSpeed = 0.1;
 
     if (e.keyCode == '38') {
-        maze.movePlayer(NORTH)
+        maze.movePlayer(getDir(NORTH))
         camera.setPosition(camera.cameraPos.traslation(camera.cameraFront.scalar(cameraSpeed)))
         updateMaze()
         // up arrow
     }
     else if (e.keyCode == '40') {
-        maze.movePlayer(SOUTH)
+        maze.movePlayer(getDir(SOUTH))
         camera.setPosition(camera.cameraPos.minus(camera.cameraFront.scalar(cameraSpeed)))
         updateMaze()
         // down arrow
     }
     else if (e.keyCode == '37') {
-        maze.movePlayer(WEST)
+        maze.movePlayer(getDir(WEST))
         camera.setPosition(camera.cameraPos.traslation(camera.cameraFront.cross(camera.cameraUp).scalar(cameraSpeed)));
         updateMaze()
        // left arrow
     }
     else if (e.keyCode == '39') {
-        maze.movePlayer(EAST)
+        maze.movePlayer(getDir(EAST))
         camera.setPosition(camera.cameraPos.minus(camera.cameraFront.cross(camera.cameraUp).scalar(cameraSpeed)));
         updateMaze()
        // right arrow

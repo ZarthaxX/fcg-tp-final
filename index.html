@@ -34,7 +34,7 @@
             <div class="control-group">
                 
                 <div class="control"><input id="upper-view" name="upper-view" type="checkbox" onchange="setUpperView(this)" unchecked /><label for="upper-view"> Vista superior</label></div>
-                <div class="control"><input id="light-switch" name="light-switch" type="checkbox" unchecked onchange="UseLight()"/><label for="light-switch"> Usar luz</label></div>
+                <div class="control"><input id="light-switch" name="light-switch" type="checkbox" unchecked onchange="SetLight(this)"/><label for="light-switch"> Usar luz</label></div>
                 <div class="control"><span id="shininess-label">Intensidad:</span><span id="shininess-value">1</span><input id="shininess-exp" type="range" min="0" max="100" value="50" oninput="SetShininess(this)"/></div>
             </div>
             <div class="control-group">

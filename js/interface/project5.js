@@ -8,6 +8,7 @@ var yaw = 90;
 var pitch = 0;
 var upperViewEnabled = false;
 var directionToDegrees = {}
+var direction
 
 var rotX=0, rotY=0, transZ=0.2, autorot=0;
 
@@ -165,6 +166,8 @@ function UpdateProjectionMatrix()
 function setUpperView(item){
 	upperViewEnabled = item.checked;
 	if(!upperViewEnabled) transZ = 0.2
+	if(upperViewEnabled) fov = 60;
+	else fov = 100;
 	DrawScene();
 }
 // Funcion que reenderiza la escena. 
@@ -202,8 +205,9 @@ function DrawScene()
 
 }
 
-function UseLight(param) {
-	meshDrawer.useLight( param.checked );
+function SetLight(param) {
+	meshDrawer.setLight( param.checked );
+	DrawScene();
 }
 
 // Función que compila los shaders que se le pasan por parámetro (vertex & fragment shaders)
@@ -291,35 +295,6 @@ window.onload = function()
 		DrawScene();
 	}
 	canvas.onwheel = function() { canvas.zoom(0.3*event.deltaY); }
-
-	// Evento de click 
- 	/*canvas.onmousedown = function() 
-	{
-		var cx = event.clientX;
-		var cy = event.clientY;
-		if ( event.ctrlKey ) 
-		{
-			canvas.onmousemove = function() 
-			{
-				canvas.zoom(5*(event.clientY - cy));
-				cy = event.clientY;
-			}
-		}
-		else 
-		{   
-			// Si se mueve el mouse, actualizo las matrices de rotación
-			canvas.onmousemove = function() 
-			{
-				rotY += (cx - event.clientX)/canvas.width*2.2;
-				rotX += (cy - event.clientY)/canvas.height*2.2;
-				cx = event.clientX;
-				cy = event.clientY;
-				UpdateProjectionMatrix();
-				DrawScene();
-			} 
-		}
-	} */
-
 	// Evento soltar el mouse
 	canvas.onmouseup = canvas.onmouseleave = function() 
 	{
@@ -361,7 +336,7 @@ window.onload = function()
 			yaw += xoffset;
 			pitch += yoffset;
 
-			var direction = new Vertex3(directionsVec[maze.player.direction].x, directionsVec[maze.player.direction].y,0);
+			direction = new Vertex3(directionsVec[maze.player.direction].x, directionsVec[maze.player.direction].y,0);
 			yaw_radians = yaw * (Math.PI / 180);
 			pitch_radians = pitch * (Math.PI / 180);
 

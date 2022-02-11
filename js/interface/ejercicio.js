@@ -64,7 +64,7 @@ class MeshDrawer
 	{
 		this.prog   = InitShaderProgram(meshVS, meshFS);
 
-		this.swap = gl.getUniformLocation(this.prog, 'swap');
+		this.lightEnabled = gl.getUniformLocation(this.prog, 'lightEnabled');
 
 		this.sampler = gl.getUniformLocation(this.prog, 'texGPU');
 
@@ -165,9 +165,11 @@ class MeshDrawer
 		gl.uniform3f(this.lightDir, x, y, z);
 	}
 	
-	useLight(value) 
-	{
-		
+	setLight(value) 
+	{		
+		gl.useProgram(this.prog);
+		if(value) gl.uniform1i(this.lightEnabled, 1);
+		else gl.uniform1i(this.lightEnabled, 0);
 	}
 
 	// Este método se llama al actualizar el brillo del material 
@@ -180,7 +182,6 @@ class MeshDrawer
 
 // Vertex Shader
 var meshVS = `
-	uniform int swap;
 
 	attribute vec3 pos;
 	attribute vec2 tc;
@@ -198,17 +199,15 @@ var meshVS = `
 		texCoord = tc;
 		normCoord = norm;
 		vertCoord = (-mv * vec4(pos, 1.0)).xyz;
-
-		if(swap == 0){
-			gl_Position = mvp * vec4(pos,1);
-		}else{
-			gl_Position = mvp * vec4(pos.x,pos.z,pos.y,1);
-		}
+		
+		gl_Position = mvp * vec4(pos,1);
 	}
 `;
 
 // Fragment Shader
 var meshFS = `
+	uniform bool lightEnabled;
+
 	precision mediump float;
 	
 	uniform sampler2D texGPU;
@@ -235,6 +234,12 @@ var meshFS = `
 		vec3 h = normalize(v + l);
 		float cosTheta = dot(n, l);
 		float cosOmega = dot(n, h);
+
+		if(lightEnabled)
+			gl_FragColor =  
+				vec4(1.0, 1.0, 1.0, 1.0) *
+				max(0.0, cosTheta) *
+				(kd + (ks * pow(max(0.0, cosOmega), alpha) / cosTheta));
 		gl_FragColor.w = 1.0;
 	}
 `;
