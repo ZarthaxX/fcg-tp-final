@@ -53,25 +53,25 @@ function checkKey(e) {
     e = e || window.event;
     var cameraSpeed = 0.1;
 
-    if (e.keyCode == '38') {
+    if (e.keyCode == '38' || e.keyCode == '87') {
         maze.movePlayer(getDir(NORTH))
         camera.setPosition(camera.cameraPos.traslation(camera.cameraFront.scalar(cameraSpeed)))
         updateMaze()
         // up arrow
     }
-    else if (e.keyCode == '40') {
+    else if (e.keyCode == '40' || e.keyCode == '83') {
         maze.movePlayer(getDir(SOUTH))
         camera.setPosition(camera.cameraPos.minus(camera.cameraFront.scalar(cameraSpeed)))
         updateMaze()
         // down arrow
     }
-    else if (e.keyCode == '37') {
+    else if (e.keyCode == '37' || e.keyCode == '65') {
         maze.movePlayer(getDir(WEST))
         camera.setPosition(camera.cameraPos.traslation(camera.cameraFront.cross(camera.cameraUp).scalar(cameraSpeed)));
         updateMaze()
        // left arrow
     }
-    else if (e.keyCode == '39') {
+    else if (e.keyCode == '39' || e.keyCode == '68') {
         maze.movePlayer(getDir(EAST))
         camera.setPosition(camera.cameraPos.minus(camera.cameraFront.cross(camera.cameraUp).scalar(cameraSpeed)));
         updateMaze()

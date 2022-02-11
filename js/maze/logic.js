@@ -350,6 +350,10 @@ class Maze{
         }
     }
 
+    changePlayerDirection(direction) {
+        this.player.pointInDirection(direction)
+    }
+
     playerCanGoInDirection(direction) {
         var dirVec = directionsVec[direction]
         var leaving = this.player.point

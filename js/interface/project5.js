@@ -191,8 +191,6 @@ function DrawScene()
 		mvp = MatrixMult( perspectiveMatrix, view);
 	}
 
-
-
 	// 2. Limpiamos la escena
 	gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 	
@@ -346,6 +344,8 @@ window.onload = function()
 			camera.setFront(direction.normalize());
 			UpdateProjectionMatrix();
 			DrawScene();
+			//ugly hack to change player direction when camera moves
+			maze.changePlayerDirection(getDir(NORTH))
 		}
 	});
 	
