@@ -9,6 +9,7 @@ var pitch = 0;
 var upperViewEnabled = false;
 var directionToDegrees = {}
 var direction
+var fov_angle = 100
 
 var rotX=0, rotY=0, transZ=0.2, autorot=0;
 
@@ -140,9 +141,8 @@ function UpdateCanvasSize()
 }
 
 // Calcula la matriz de perspectiva (column-major)
-function ProjectionMatrix( c, fov_angle=55 )
+function ProjectionMatrix( c )
 {
-	fov_angle = 100.0
 	var r = c.width / c.height;
 	var n = 0.1;
 	var f = 100;
@@ -166,8 +166,8 @@ function UpdateProjectionMatrix()
 function setUpperView(item){
 	upperViewEnabled = item.checked;
 	if(!upperViewEnabled) transZ = 0.2
-	if(upperViewEnabled) fov = 60;
-	else fov = 100;
+	if(upperViewEnabled) fov_angle = 60;
+	else fov_angle = 60;
 	DrawScene();
 }
 // Funcion que reenderiza la escena. 
