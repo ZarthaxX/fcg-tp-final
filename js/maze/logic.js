@@ -160,13 +160,11 @@ class Door {
 
         switch(this.direction){
             case NORTH:
-                return dir != SOUTH
             case SOUTH:
-                return dir != NORTH
+                return dir != SOUTH && dir != NORTH
             case WEST:
-                return dir != EAST
             case EAST:
-                return dir != WEST
+                return dir != EAST && dir != WEST
         }
     }
 
@@ -359,7 +357,6 @@ class Maze{
         var leaving = this.player.point
         var entering = this.player.point.sum(dirVec)
         return this.cellInBounds(entering) 
-            && this.cells[leaving.y][leaving.x].canLeave(direction)
             && this.cells[entering.y][entering.x].canEnter(direction)
     }
 

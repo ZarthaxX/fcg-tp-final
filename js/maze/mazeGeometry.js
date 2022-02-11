@@ -98,9 +98,17 @@ const facesTextures = {
         0.0,  0.0,
     ],
     // Bottom
-    "BOTTOM-DOOR" : [
+    "MIDDLE-BOTTOM-TOP" : [
         1.0,  0.0,
         1.0,  1.0,
+        0.0,  0.0,
+        1.0,  1.0,
+        0.0,  1.0,
+        0.0,  0.0,
+    ],
+    "MIDDLE-RIGHT-LEFT" : [
+        1.0,  1.0,
+        1.0,  0.0,
         0.0,  0.0,
         1.0,  1.0,
         0.0,  1.0,
@@ -121,8 +129,10 @@ const facesNormals = {
     "LEFT" : Array(6).fill(new Vertex3(-1.0, 0.0, 0.0)),
     // Right
     "RIGHT" : Array(6).fill(new Vertex3(1.0, 0.0, 0.0)),
-    // Bottom
-    "BOTTOM-DOOR" : Array(6).fill(new Vertex3(0.0, -1.0, 0.0)),
+    // Middle bottom top
+    "MIDDLE-BOTTOM-TOP" : Array(6).fill(new Vertex3(0.0, -1.0, 0.0)),
+    // Middle right left
+    "MIDDLE-RIGHT-LEFT" : Array(6).fill(new Vertex3(1.0, 0.0, 0.0)),
 };
 
 const facesVertices = {
@@ -162,11 +172,17 @@ const facesVertices = {
         // right - lower
         ppp, pnp, pnn
     ],
-    "BOTTOM-DOOR" : [  
+    "MIDDLE-BOTTOM-TOP" : [  
         // bottom - upper
         new Vertex3(-1.0, 0, -1.0), new Vertex3(-1.0, 0, 1.0), new Vertex3(1.0, 0, -1.0),
         // bottom - lower
         new Vertex3(-1.0, 0, 1.0), new Vertex3(1.0, 0, 1.0), new Vertex3(1.0, 0, -1.0),
+    ],
+    "MIDDLE-RIGHT-LEFT" : [  
+        // bottom - upper
+        new Vertex3(0, 1.0, 1.0), new Vertex3(0, 1.0, -1.0), new Vertex3(0, -1.0, -1.0),
+        // bottom - lower
+        new Vertex3(0, 1.0, 1.0), new Vertex3(0, -1.0, 1.0), new Vertex3(0, -1.0, -1.0),
     ],
 };
 
@@ -243,19 +259,19 @@ const nullGeometry = new GeometryObjectData().toGeometryObject();
 
 var doorsGeometry = {
     "S" : new GeometryObjectData()
-        .withFaces(["TOP"])
+        .withFaces(["MIDDLE-BOTTOM-TOP"])
         .withScale(1.0)
         .toGeometryObject(),
     "N" : new GeometryObjectData()
-        .withFaces(["BOTTOM-DOOR"])
+        .withFaces(["MIDDLE-BOTTOM-TOP"])
         .withScale(1.0)
         .toGeometryObject(),
     "E" : new GeometryObjectData()
-        .withFaces(["RIGHT"])
+        .withFaces(["MIDDLE-RIGHT-LEFT"])
         .withScale(1.0)
         .toGeometryObject(),
     "W" : new GeometryObjectData()
-        .withFaces(["LEFT"])
+        .withFaces(["MIDDLE-RIGHT-LEFT"])
         .withScale(1.0)
         .toGeometryObject(),
 };
