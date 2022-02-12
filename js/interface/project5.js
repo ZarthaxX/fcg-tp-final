@@ -9,7 +9,7 @@ var direction
 var yaw = 90;
 var pitch = 0;
 var upperViewEnabled = false;
-var fov_angle = 100
+var fov_angle = 60
 var rotX=0, rotY=0, transZ=0.2, autorot=0;
 var textures = [];
 
@@ -74,6 +74,7 @@ function InitWebGL()
 			textures.push(texture);
 		}
 		meshDrawer.setTextures(textures)
+		meshDrawer.setShininess(2);
 		UpdateCanvasSize();
 		initGame();
 		DrawScene();
@@ -223,8 +224,6 @@ window.onload = function()
 		}
 	}
 
-	SetShininess( document.getElementById('shininess-exp') );
-
 	var isOnDiv = false;
 	document.getElementById("controls").addEventListener("mouseenter", function(  ) {
 		isOnDiv=true;
@@ -257,7 +256,31 @@ function SetShininess( param )
 	var exp = param.value;
 	var s = Math.pow(10,exp/25);
 	document.getElementById('shininess-value').innerText = s.toFixed( s < 10 ? 2 : 0 );
-	meshDrawer.setShininess(s);
+}
+
+function SetMaxHeight(param)
+{
+	MAX_HEIGHT = param.value;
+}
+
+function SetMaxWidth( param )
+{
+	MAX_WIDTH = param.value;
+}
+
+function SetMinHeight(param)
+{
+	MIN_HEIGHT = param.value;
+}
+
+function SetMinWidth( param )
+{
+	MIN_WIDTH = param.value;
+}
+
+function ResetMaze( param ) {
+	initGame()
+	DrawScene()
 }
 
 // ======== Funciones auxiliares ========

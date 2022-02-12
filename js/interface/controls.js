@@ -99,10 +99,10 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const MIN_WIDTH = 11;
-const MIN_HEIGHT = 11;
-const MAX_WIDTH = 11;
-const MAX_HEIGHT = 11;
+var MIN_WIDTH = 11;
+var MIN_HEIGHT = 11;
+var MAX_WIDTH = 11;
+var MAX_HEIGHT = 11;
 
 function initGame() {  
     const generator = new Math.seedrandom()

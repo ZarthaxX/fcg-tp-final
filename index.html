@@ -31,13 +31,19 @@
         <div id="controls">
             <div class="control-group"><canvas id="lightcontrol"></canvas><div id="lightcontrol-label">Dirección de la Luz</div></div>
             <div class="control-group">
-                
                 <div class="control"><input id="upper-view" name="upper-view" type="checkbox" onchange="setUpperView(this)" unchecked /><label for="upper-view"> Vista superior</label></div>
                 <div class="control"><input id="light-switch" name="light-switch" type="checkbox" unchecked onchange="SetLight(this)"/><label for="light-switch"> Usar luz</label></div>
-                <div class="control"><span id="shininess-label">Intensidad:</span><span id="shininess-value">1</span><input id="shininess-exp" type="range" min="0" max="100" value="50" oninput="SetShininess(this)"/></div>
+              </div>
+            <div class="control-group"><div id="mazesizecontrol-label">Dimensiones de laberinto</div></div>
+                <div class="control"><span id="mazesizecontrol-label">Maxima largo:</span><span id="max-height-value">1</span><input id="shininess-exp" type="range" min="5" max="100" value="5" oninput="SetMaxHeight(this)"/></div>
+                <div class="control"><span id="mazesizecontrol-label">Maximo ancho:</span><span id="max-width-value">1</span><input id="shininess-exp" type="range" min="5" max="100" value="5" oninput="SetMaxWidth(this)"/></div>
+                <div class="control"><span id="mazesizecontrol-label">Minimo largo:</span><span id="min-height-value">1</span><input id="shininess-exp" type="range" min="5" max="100" value="5" oninput="SetMinHeight(this)"/></div>
+                <div class="control"><span id="mazesizecontrol-label">Minimo ancho:</span><span id="min-width-value">1</span><input id="shininess-exp" type="range" min="5" max="100" value="5" oninput="SetMinWidth(this)"/></div>
             </div>
+            
+
             <div class="control-group">
-                <img id="texture-img" />
+                <div class="control"><button type="button" id="reset-maze-label" onclick=ResetMaze(this)>Generar laberinto</button></div>
             </div>
             <div class="control-group">
                     <legend>Laberinto</legend>
