@@ -1,10 +1,3 @@
-// Esta función recibe la matriz de proyección (ya calculada), una 
-// traslación y dos ángulos de rotación (en radianes). Cada una de 
-// las rotaciones se aplican sobre el eje x e y, respectivamente. 
-// La función debe retornar la combinación de las transformaciones 
-// 3D (rotación, traslación y proyección) en una matriz de 4x4, 
-// representada por un arreglo en formato column-major. 
-
 function GetModelViewMatrix(translationX, translationY, translationZ, rotationX, rotationY)
 {
 	var rotXMatrix = [
@@ -56,7 +49,6 @@ function getCameraMatrix(position, target, worldUp) {
 	return MatrixMult(left, right);
 }
 
-// [COMPLETAR] Completar la implementación de esta clase.
 class MeshDrawer
 {
 	// El constructor es donde nos encargamos de realizar las inicializaciones necesarias. 
@@ -88,16 +80,7 @@ class MeshDrawer
 	static getNextID() {
 		return this.meshCounter++;
 	}
-	// Esta función se llama cada vez que el usuario carga un nuevo
-	// archivo OBJ. En los argumentos de esta función llegan un areglo
-	// con las posiciones 3D de los vértices, un arreglo 2D con las
-	// coordenadas de textura y las normales correspondientes a cada 
-	// vértice. Todos los items en estos arreglos son del tipo float. 
-	// Los vértices y normales se componen de a tres elementos 
-	// consecutivos en el arreglo vertPos [x0,y0,z0,x1,y1,z1,..] y 
-	// normals [n0,n0,n0,n1,n1,n1,...]. De manera similar, las 
-	// cooredenadas de textura se componen de a 2 elementos 
-	// consecutivos y se  asocian a cada vértice en orden. 
+
 	setMesh(vertPos, texCoords, normals)
 	{
 		this.numTriangles = vertPos.length / 3 / 3;
@@ -112,17 +95,10 @@ class MeshDrawer
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
 	}
 	
-	// Esta función se llama para dibujar la malla de triángulos
-	// El argumento es la matriz model-view-projection (matrixMVP),
-	// la matriz model-view (matrixMV) que es retornada por 
-	// GetModelViewProjection y la matriz de transformación de las 
-	// normales (matrixNormal) que es la inversa transpuesta de matrixMV
 	draw(texID, matrixMVP, matrixMV, matrixNormal)
 	{
 		gl.useProgram(this.prog);
-		//gl.activeTexture(gl.TEXTURE0+this.meshID);
-		//gl.bindTexture(gl.TEXTURE_2D, this.texture);
-
+		
 		gl.uniformMatrix4fv(this.mvp, false, matrixMVP);
 		gl.uniformMatrix4fv(this.mv, false, matrixMV);
 		gl.uniformMatrix3fv(this.mn, false, matrixNormal);
@@ -151,8 +127,6 @@ class MeshDrawer
 		gl.drawArrays(gl.TRIANGLES, 0, this.numTriangles * 3);
 	}
 	
-	// Esta función se llama para setear una textura sobre la malla
-	// El argumento es un componente <img> de html que contiene la textura. 
 	setTextures(textures)
 	{
 		this.textures = textures

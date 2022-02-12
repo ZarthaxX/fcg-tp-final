@@ -25,10 +25,10 @@ var NORTH = "N"
 var EAST = "E"
 var WEST = "W"
 var directionsVec = {
-    "S" : new Point(0,1),
-    "N" : new Point(0,-1),
-    "E" : new Point(1,0),
-    "W" : new Point(-1,0)
+    "S" : new Point(0,-1),
+    "N" : new Point(0,1),
+    "E" : new Point(-1,0),
+    "W" : new Point(1,0)
 };
 var directions = [EAST, WEST, NORTH, SOUTH]
 
@@ -346,10 +346,6 @@ class Maze{
         if(this.playerCanGoInDirection(direction)){
            this.player.moveInDirection(direction)
         }
-    }
-
-    changePlayerDirection(direction) {
-        this.player.pointInDirection(direction)
     }
 
     playerCanGoInDirection(direction) {

@@ -1,4 +1,3 @@
-// Controles para la dirección de la luz
 var lightView;
 
 class LightView

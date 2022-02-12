@@ -55,24 +55,28 @@ function checkKey(e) {
 
     if (e.keyCode == '38' || e.keyCode == '87') {
         maze.movePlayer(getDir(NORTH))
+        camera.setFront(new Vertex3(directionsVec[NORTH].x,directionsVec[NORTH].y,0))
         camera.setPosition(camera.cameraPos.traslation(camera.cameraFront.scalar(cameraSpeed)))
         updateMaze()
         // up arrow
     }
     else if (e.keyCode == '40' || e.keyCode == '83') {
         maze.movePlayer(getDir(SOUTH))
+        camera.setFront(new Vertex3(directionsVec[SOUTH].x,directionsVec[SOUTH].y,0))
         camera.setPosition(camera.cameraPos.minus(camera.cameraFront.scalar(cameraSpeed)))
         updateMaze()
         // down arrow
     }
     else if (e.keyCode == '37' || e.keyCode == '65') {
         maze.movePlayer(getDir(WEST))
+        camera.setFront(new Vertex3(-directionsVec[WEST].x,directionsVec[WEST].y,0))
         camera.setPosition(camera.cameraPos.traslation(camera.cameraFront.cross(camera.cameraUp).scalar(cameraSpeed)));
         updateMaze()
        // left arrow
     }
     else if (e.keyCode == '39' || e.keyCode == '68') {
         maze.movePlayer(getDir(EAST))
+        camera.setFront(new Vertex3(-directionsVec[EAST].x,directionsVec[EAST].y,0))
         camera.setPosition(camera.cameraPos.minus(camera.cameraFront.cross(camera.cameraUp).scalar(cameraSpeed)));
         updateMaze()
        // right arrow

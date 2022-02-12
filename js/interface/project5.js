@@ -4,14 +4,15 @@ var meshFloor;
 var canvas, gl;         // canvas y contexto WebGL
 var perspectiveMatrix;	// matriz de perspectiva
 var camera;
+var direction
+// Euler angles
 var yaw = 90;
 var pitch = 0;
 var upperViewEnabled = false;
-var directionToDegrees = {}
-var direction
 var fov_angle = 100
-
 var rotX=0, rotY=0, transZ=0.2, autorot=0;
+var textures = [];
+
 
 class Camera {
 
@@ -34,45 +35,11 @@ class Camera {
 	}
 }
 
-var textures = [];
-
-function loadImage(url, callback) {
-	var image = new Image();
-	image.src = url;
-	image.onload = callback;
-	return image;
-  }
-  
-  function loadImages(urls, callback) {
-	var images = [];
-	var imagesToLoad = urls.length;
-  
-	// Called each time an image finished
-	// loading.
-	var onImageLoad = function() {
-	  --imagesToLoad;
-	  // If all the images are loaded call the callback.
-	  if (imagesToLoad === 0) {
-		callback(images);
-	  }
-	};
-  
-	for (var ii = 0; ii < imagesToLoad; ++ii) {
-	  var image = loadImage(urls[ii], onImageLoad);
-	  images.push(image);
-	}
-  }
-
 // Funcion de inicialización, se llama al cargar la página
 function InitWebGL()
 {
 	camera = new Camera();
-	
-	directionToDegrees[WEST] = 0
-	directionToDegrees[NORTH] = 90
-	directionToDegrees[EAST] = 180
-	directionToDegrees[SOUTH] = 270
-	
+	direction = new Vertex3(directionsVec[SOUTH].x,directionsVec[SOUTH].y,0)
 	// Inicializamos el canvas WebGL
 	canvas = document.getElementById("canvas");
 	canvas.oncontextmenu = function() {return false;};
@@ -87,7 +54,6 @@ function InitWebGL()
 	gl.clearColor(0,0,0,0);
 	gl.enable(gl.DEPTH_TEST); // habilitar test de profundidad 
 	
-	// Inicializar los shaders y buffers para renderizar	
 	meshDrawer = new MeshDrawer();
 	loadImages([floorTexture, wallTexture, closedDoorTexture, portalTexture, openDoorTexture], (images) => {
 		// create 2 textures
@@ -108,7 +74,6 @@ function InitWebGL()
 			textures.push(texture);
 		}
 		meshDrawer.setTextures(textures)
-		// Setear el tamaño del viewport
 		UpdateCanvasSize();
 		initGame();
 		DrawScene();
@@ -116,10 +81,8 @@ function InitWebGL()
 
 }
 
-// Funcion para actualizar el tamaño de la ventana cada vez que se hace resize
 function UpdateCanvasSize()
 {
-	// 1. Calculamos el nuevo tamaño del viewport
 	canvas.style.width  = "100%";
 	canvas.style.height = "100%";
 
@@ -133,57 +96,28 @@ function UpdateCanvasSize()
 	canvas.style.width  = width  + 'px';
 	canvas.style.height = height + 'px';
 	
-	// 2. Lo seteamos en el contexto WebGL
 	gl.viewport( 0, 0, canvas.width, canvas.height );
 
-	// 3. Cambian las matrices de proyección, hay que actualizarlas
 	UpdateProjectionMatrix();
 }
 
-// Calcula la matriz de perspectiva (column-major)
-function ProjectionMatrix( c )
-{
-	var r = c.width / c.height;
-	var n = 0.1;
-	var f = 100;
-	var fov = 3.145 * fov_angle / 180;
-	var s = 1 / Math.tan( fov/2 );
-	
-	return [
-		s/r, 0, 0, 0,
-		0, s, 0, 0,
-		0, 0, (n+f)/(f-n), 1,
-		0, 0, -2*n*f/(f-n), 0
-	];
-}
-
-// Devuelve la matriz de perspectiva (column-major)
-function UpdateProjectionMatrix()
-{
-	perspectiveMatrix = ProjectionMatrix( canvas, transZ );
-}
-
-function setUpperView(item){
-	upperViewEnabled = item.checked;
-	if(!upperViewEnabled) transZ = 0.2
-	if(upperViewEnabled) fov_angle = 60;
-	else fov_angle = 60;
-	DrawScene();
-}
-// Funcion que reenderiza la escena. 
 function DrawScene()
 {
+	// si el maze no fue creado no renderizamos la escena
 	if(maze == undefined)
 		return
 	width = maze.width
 	height = maze.height
 	currentPos = maze.player.point
 	currentDir = maze.player.direction
-	// 1. Obtenemos las matrices de transformación 
+	// Obtenemos las matrices de transformación de la camara
 	camera.setPosition(new Vertex3(0, 0, 0));
 	cameraMatrix = getCameraMatrix(camera.cameraPos, camera.cameraFront.traslation(camera.cameraPos) , camera.cameraUp);
+	// obtenemos la model view matrix
 	var mv  = GetModelViewMatrix( 0,0, transZ, rotX, autorot+rotY );
 	var view = MatrixMult(cameraMatrix, mv)
+	
+	//calculamos la model view projection matrix dependiendo si estamos usando la vista superior o no
 	var mvp
 	if(upperViewEnabled){
 		mvp = MatrixMult( perspectiveMatrix, mv);
@@ -191,10 +125,9 @@ function DrawScene()
 		mvp = MatrixMult( perspectiveMatrix, view);
 	}
 
-	// 2. Limpiamos la escena
 	gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 	
-	// 3. Le pedimos a cada objeto que se dibuje a si mismo
+	// Dibujamos los objetos
 	var nrmTrans = [ mv[0],mv[1],mv[2], mv[4],mv[5],mv[6], mv[8],mv[9],mv[10] ];
 	if(mazeDrawers != undefined)
 	for(var i = 0; i < mazeDrawers.length; i++) {
@@ -203,10 +136,6 @@ function DrawScene()
 
 }
 
-function SetLight(param) {
-	meshDrawer.setLight( param.checked );
-	DrawScene();
-}
 
 // Función que compila los shaders que se le pasan por parámetro (vertex & fragment shaders)
 // Recibe los strings de cada shader y retorna un programa
@@ -230,18 +159,13 @@ function InitShaderProgram( vsSource, fsSource, wgl=gl )
 	return prog;
 }
 
-// Función para compilar shaders, recibe el tipo (gl.VERTEX_SHADER o gl.FRAGMENT_SHADER)
-// y el código en forma de string. Es llamada por InitShaderProgram()
 function CompileShader( type, source, wgl=gl )
 {
-	// Creamos el shader
 	const shader = wgl.createShader(type);
 
-	// Lo compilamos
 	wgl.shaderSource(shader, source);
 	wgl.compileShader(shader);
 
-	// Verificamos si la compilación fue exitosa
 	if (!wgl.getShaderParameter( shader, wgl.COMPILE_STATUS) ) 
 	{
 		alert('Ocurrió un error durante la compilación del shader:' + wgl.getShaderInfoLog(shader));
@@ -252,8 +176,6 @@ function CompileShader( type, source, wgl=gl )
 	return shader;
 }
 
-// Multiplica 2 matrices y devuelve A*B.
-// Los argumentos y el resultado son arreglos que representan matrices en orden column-major
 function MatrixMult( A, B )
 {
 	var C = [];
@@ -274,18 +196,11 @@ function MatrixMult( A, B )
 }
 
 // ======== Funciones para el control de la interfaz ========
-
-var showBox;  // boleano para determinar si se debe o no mostrar la caja
-
 // Al cargar la página
 window.onload = function() 
 {
-	showBox = document.getElementById('show-box');
 	InitWebGL();
-	// Componente para la luz
 	lightView = new LightView();
-
-	// Evento de zoom (ruedita)
 	canvas.zoom = function( s ) 
 	{
 		if(upperViewEnabled) transZ *= s/canvas.height + 1.0;
@@ -293,15 +208,10 @@ window.onload = function()
 		DrawScene();
 	}
 	canvas.onwheel = function() { canvas.zoom(0.3*event.deltaY); }
-	// Evento soltar el mouse
-	canvas.onmouseup = canvas.onmouseleave = function() 
-	{
-		canvas.onmousemove = null;
-	}
+	canvas.onmouseup = canvas.onmouseleave = function(){canvas.onmousemove = null;}
 
-	// Checks if mouse is down.
+	// registramos si el mouse esta apretado
 	var mouseDown = 0;
-
 	document.body.onmousedown = function() {
 		if(mouseDown == 0){
 			mouseDown = 1;
@@ -330,27 +240,11 @@ window.onload = function()
 		yoffset = event.movementY * mouseSensitivity;
 		
 		if(mouseDown && !isOnDiv){
-
-			yaw += xoffset;
-			pitch += yoffset;
-
-			direction = new Vertex3(directionsVec[maze.player.direction].x, directionsVec[maze.player.direction].y,0);
-			yaw_radians = yaw * (Math.PI / 180);
-			pitch_radians = pitch * (Math.PI / 180);
-
-			direction.x = Math.cos(yaw_radians) * Math.cos(pitch_radians);
-			direction.y = Math.sin(yaw_radians) * Math.cos(pitch_radians);
-			direction.z = - Math.sin(pitch_radians);
-			camera.setFront(direction.normalize());
-			UpdateProjectionMatrix();
-			DrawScene();
-			//ugly hack to change player direction when camera moves
-			maze.changePlayerDirection(getDir(NORTH))
+			rotateByEulerAngle(xoffset, yoffset)
 		}
 	});
 	
 };
-
 // Evento resize
 function WindowResize()
 {
@@ -358,79 +252,6 @@ function WindowResize()
 	DrawScene();
 }
 
-// Control de la calesita de rotación
-var timer;
-function AutoRotate( param )
-{
-	// Si hay que girar...
-	if ( param.checked ) 
-	{
-		// Vamos rotando una cantiad constante cada 30 ms
-		timer = setInterval( function() 
-		{
-				var v = document.getElementById('rotation-speed').value;
-				autorot += 0.0005 * v;
-				if ( autorot > 2*Math.PI ) autorot -= 2*Math.PI;
-
-				// Reenderizamos
-				DrawScene();
-			}, 30
-		);
-		document.getElementById('rotation-speed').disabled = false;
-	} 
-	else 
-	{
-		clearInterval( timer );
-		document.getElementById('rotation-speed').disabled = true;
-	}
-}
-
-// Control de textura visible
-function ShowTexture( param )
-{
-	meshWall.showTexture( param.checked );
-	meshFloor.showTexture( param.checked );
-}
-
-// Control de intercambiar y-z
-function SwapYZ( param )
-{
-	meshDrawer.swapYZ( param.checked );
-}
-
-// Cargar archivo obj
-function LoadObj( param )
-{
-	if ( param.files && param.files[0] ) 
-	{
-		var reader = new FileReader();
-		reader.onload = function(e) 
-		{
-			var mesh = new ObjMesh;
-			mesh.parse( e.target.result );
-			var box = mesh.getBoundingBox();
-			var shift = [
-				-(box.min[0]+box.max[0])/2,
-				-(box.min[1]+box.max[1])/2,
-				-(box.min[2]+box.max[2])/2
-			];
-			var size = [
-				(box.max[0]-box.min[0])/2,
-				(box.max[1]-box.min[1])/2,
-				(box.max[2]-box.min[2])/2
-			];
-			var maxSize = Math.max( size[0], size[1], size[2] );
-			var scale = 1/maxSize;
-			mesh.shiftAndScale( shift, scale );
-			var buffers = mesh.getVertexBuffers();
-			meshDrawer.setMesh( buffers.positionBuffer, buffers.texCoordBuffer, buffers.normalBuffer );
-			DrawScene();
-		}
-		reader.readAsText( param.files[0] );
-	}
-}
-
-// Setear Intensidad
 function SetShininess( param )
 {
 	var exp = param.value;
@@ -439,3 +260,80 @@ function SetShininess( param )
 	meshDrawer.setShininess(s);
 }
 
+// ======== Funciones auxiliares ========
+function loadImage(url, callback) {
+	var image = new Image();
+	image.src = url;
+	image.onload = callback;
+	return image;
+  }
+  
+function loadImages(urls, callback) {
+	var images = [];
+	var imagesToLoad = urls.length;
+
+	// Called each time an image finished
+	// loading.
+	var onImageLoad = function() {
+		--imagesToLoad;
+		// If all the images are loaded call the callback.
+		if (imagesToLoad === 0) {
+		callback(images);
+		}
+	};
+
+	for (var ii = 0; ii < imagesToLoad; ++ii) {
+		var image = loadImage(urls[ii], onImageLoad);
+		images.push(image);
+	}
+}
+
+function ProjectionMatrix( c )
+{
+	var r = c.width / c.height;
+	var n = 0.1;
+	var f = 100;
+	var fov = 3.145 * fov_angle / 180;
+	var s = 1 / Math.tan( fov/2 );
+	
+	return [
+		s/r, 0, 0, 0,
+		0, s, 0, 0,
+		0, 0, (n+f)/(f-n), 1,
+		0, 0, -2*n*f/(f-n), 0
+	];
+}
+
+function UpdateProjectionMatrix()
+{
+	perspectiveMatrix = ProjectionMatrix( canvas, transZ );
+}
+
+function rotateByEulerAngle(xoffset, yoffset){
+	yaw += xoffset;
+	pitch += yoffset;
+
+	direction = new Vertex3(directionsVec[maze.player.direction].x, directionsVec[maze.player.direction].y,0);
+	yaw_radians = yaw * (Math.PI / 180);
+	pitch_radians = pitch * (Math.PI / 180);
+
+	direction.x = Math.cos(yaw_radians) * Math.cos(pitch_radians);
+	direction.y = Math.sin(yaw_radians) * Math.cos(pitch_radians);
+	direction.z = - Math.sin(pitch_radians);
+	camera.setFront(direction.normalize());
+	UpdateProjectionMatrix();
+	DrawScene();
+}
+
+function setUpperView(item){
+	upperViewEnabled = item.checked;
+	if(!upperViewEnabled) transZ = 0.2
+	if(upperViewEnabled) fov_angle = 60;
+	else fov_angle = 60;
+	DrawScene();
+}
+
+function SetLight(param) {
+	meshDrawer.setLight( param.checked );
+	DrawScene();
+}
