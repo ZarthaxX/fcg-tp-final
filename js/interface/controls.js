@@ -47,36 +47,57 @@ function getDir(dir) {
     return intToDir[offset]
 }
 
+function updateCamera(dir) {
+    switch(dir) {
+        case NORTH:
+            yaw = 450.0
+            pitch = -1.0
+        break;
+        case SOUTH:
+            yaw = 628
+            pitch = 3.2
+        break;
+        case EAST:
+            yaw = 365
+            pitch = 5.5
+        break;
+        case WEST:
+            yaw = 540
+            pitch = 5.6
+        break;
+    }
+    rotateByEulerAngle(0,0)
+}
 
 function checkKey(e) {
 
     e = e || window.event;
     var cameraSpeed = 0.1;
-
+    var nextDir
     if (e.keyCode == '38' || e.keyCode == '87') {
-        maze.movePlayer(getDir(NORTH))
-        camera.setFront(new Vertex3(directionsVec[NORTH].x,directionsVec[NORTH].y,0))
+        nextDir = getDir(NORTH)
+        maze.movePlayer(nextDir)
         camera.setPosition(camera.cameraPos.traslation(camera.cameraFront.scalar(cameraSpeed)))
         updateMaze()
         // up arrow
     }
     else if (e.keyCode == '40' || e.keyCode == '83') {
-        maze.movePlayer(getDir(SOUTH))
-        camera.setFront(new Vertex3(directionsVec[SOUTH].x,directionsVec[SOUTH].y,0))
+        nextDir = getDir(SOUTH)
+        maze.movePlayer(nextDir)
         camera.setPosition(camera.cameraPos.minus(camera.cameraFront.scalar(cameraSpeed)))
         updateMaze()
         // down arrow
     }
     else if (e.keyCode == '37' || e.keyCode == '65') {
-        maze.movePlayer(getDir(WEST))
-        camera.setFront(new Vertex3(-directionsVec[WEST].x,directionsVec[WEST].y,0))
+        nextDir = getDir(WEST)
+        maze.movePlayer(nextDir)
         camera.setPosition(camera.cameraPos.traslation(camera.cameraFront.cross(camera.cameraUp).scalar(cameraSpeed)));
         updateMaze()
        // left arrow
     }
     else if (e.keyCode == '39' || e.keyCode == '68') {
-        maze.movePlayer(getDir(EAST))
-        camera.setFront(new Vertex3(-directionsVec[EAST].x,directionsVec[EAST].y,0))
+        nextDir = getDir(EAST)
+        maze.movePlayer(nextDir)
         camera.setPosition(camera.cameraPos.minus(camera.cameraFront.cross(camera.cameraUp).scalar(cameraSpeed)));
         updateMaze()
        // right arrow
@@ -85,7 +106,7 @@ function checkKey(e) {
         updateMaze()
     }
     updateMazeGeometry()
-    DrawScene();
+    updateCamera(nextDir)
 }
 
 function updateMazeGeometry() {
@@ -99,10 +120,10 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-var MIN_WIDTH = 11;
-var MIN_HEIGHT = 11;
-var MAX_WIDTH = 11;
-var MAX_HEIGHT = 11;
+var MIN_WIDTH = 5;
+var MIN_HEIGHT = 5;
+var MAX_WIDTH = 5;
+var MAX_HEIGHT = 5;
 
 function initGame() {  
     const generator = new Math.seedrandom()
@@ -132,6 +153,9 @@ function initGame() {
 
 function updateMaze(){
     if(maze.chestWasReached()){
+        var mazesSolvedCounter = document.getElementById("mazes-solved-counter")
+        var count = parseInt(mazesSolvedCounter.innerText, 10)
+        mazesSolvedCounter.innerText = count + 1
         initGame()
         return
     }

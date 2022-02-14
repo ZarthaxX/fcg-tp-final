@@ -260,22 +260,48 @@ function SetShininess( param )
 
 function SetMaxHeight(param)
 {
-	MAX_HEIGHT = param.value;
+	MAX_HEIGHT = parseInt(param.value, 10);
+	document.getElementById('max-height-value').innerText = MAX_HEIGHT;
+	document.getElementById('max-height').value = MAX_HEIGHT;
+	if(MIN_HEIGHT > MAX_HEIGHT){
+		SetMinHeight({value: MAX_HEIGHT.toString()});
+	}
 }
 
 function SetMaxWidth( param )
 {
-	MAX_WIDTH = param.value;
+	MAX_WIDTH = parseInt(param.value, 10);
+	document.getElementById('max-width-value').innerText = MAX_WIDTH;
+	document.getElementById('max-width').value = MAX_WIDTH;
+	if(MIN_WIDTH > MAX_WIDTH){
+		SetMinWidth({value: MAX_WIDTH.toString()});
+	}
 }
 
 function SetMinHeight(param)
 {
-	MIN_HEIGHT = param.value;
+	MIN_HEIGHT = parseInt(param.value, 10);
+	document.getElementById('min-height-value').innerText = MIN_HEIGHT;
+	document.getElementById('min-height').value = MIN_HEIGHT;
+	if(MIN_HEIGHT > MAX_HEIGHT){
+		SetMaxHeight({value: MIN_HEIGHT.toString()});
+	}
 }
 
 function SetMinWidth( param )
 {
-	MIN_WIDTH = param.value;
+	MIN_WIDTH = parseInt(param.value, 10);
+	document.getElementById('min-width-value').innerText = MIN_WIDTH;
+	document.getElementById('min-width').value = MIN_WIDTH;
+	if(MIN_WIDTH > MAX_WIDTH){
+		SetMaxWidth({value: MIN_WIDTH.toString()});
+	}
+}
+
+function SetDoorRatio( param )
+{
+	DOOR_RATIO = parseInt(param.value, 10) / 100.0;
+	document.getElementById('door-ratio-value').innerText = DOOR_RATIO;
 }
 
 function ResetMaze( param ) {
@@ -336,7 +362,6 @@ function rotateByEulerAngle(xoffset, yoffset){
 	yaw += xoffset;
 	pitch += yoffset;
 
-	direction = new Vertex3(directionsVec[maze.player.direction].x, directionsVec[maze.player.direction].y,0);
 	yaw_radians = yaw * (Math.PI / 180);
 	pitch_radians = pitch * (Math.PI / 180);
 
@@ -344,8 +369,11 @@ function rotateByEulerAngle(xoffset, yoffset){
 	direction.y = Math.sin(yaw_radians) * Math.cos(pitch_radians);
 	direction.z = - Math.sin(pitch_radians);
 	camera.setFront(direction.normalize());
+	console.log("dir: ",direction.normalize(), " yaw: ", yaw, " pitch: ", pitch);
 	UpdateProjectionMatrix();
 	DrawScene();
+	//ugly hack to change player direction when camera moves
+	maze.changePlayerDirection(getDir(NORTH))
 }
 
 function setUpperView(item){

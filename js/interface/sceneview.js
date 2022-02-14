@@ -19,7 +19,7 @@ function GetModelViewMatrix(translationX, translationY, translationZ, rotationX,
 		0, 0, 1, 0,
 		translationX, translationY, translationZ, 1
 	];
-	
+
 	var mvp = MatrixMult(trans, MatrixMult(rotYMatrix, rotXMatrix));
 	return mvp;
 }
@@ -30,7 +30,7 @@ function getCameraMatrix(position, target, worldUp) {
 	var D = P.minus(target).normalize();
 	var R = worldUp.cross(D).normalize();
 	var U = D.cross(R).normalize();
-	
+
 	//Column-Major
 	var left = [
 		R.x, U.x, D.x, 0,

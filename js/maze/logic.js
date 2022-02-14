@@ -25,10 +25,10 @@ var NORTH = "N"
 var EAST = "E"
 var WEST = "W"
 var directionsVec = {
-    "S" : new Point(0,-1),
-    "N" : new Point(0,1),
-    "E" : new Point(-1,0),
-    "W" : new Point(1,0)
+    "S" : new Point(0,1),
+    "N" : new Point(0,-1),
+    "E" : new Point(1,0),
+    "W" : new Point(-1,0)
 };
 var directions = [EAST, WEST, NORTH, SOUTH]
 
@@ -252,7 +252,7 @@ class Player {
     }
 }
 
-const DOOR_RATIO = 0.5
+var DOOR_RATIO = 0.1
 
 class Maze{
     constructor(width, height){
@@ -348,6 +348,10 @@ class Maze{
         }
     }
 
+    changePlayerDirection(direction) {
+        this.player.pointInDirection(direction)
+    }
+    
     playerCanGoInDirection(direction) {
         var dirVec = directionsVec[direction]
         var leaving = this.player.point
@@ -410,7 +414,7 @@ class MazeGenerator{
             var nextCell = directionsVec[nextDirection].scalarProduct(2).sum(currentState.cell)
             if(maze.isWall(nextCell)){
                 var linkCell = directionsVec[nextDirection].sum(currentState.cell)
-                if (Math.random() > DOOR_RATIO)
+                if (Math.random() <= DOOR_RATIO)
                     maze.setDoor(linkCell, nextDirection)
                 else
                     maze.setPath(linkCell)
