@@ -210,7 +210,7 @@ window.onload = function()
 	InitWebGL();
 	canvas.zoom = function( s ) 
 	{
-		if(upperViewEnabled) transZ *= s/canvas.height + 1.0;
+		if(upperViewEnabled) transZ *= Math.pow(s/canvas.height + 1.0, 5);
 		UpdateProjectionMatrix();
 		DrawScene();
 	}
