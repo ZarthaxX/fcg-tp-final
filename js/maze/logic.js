@@ -31,8 +31,8 @@ var directionsVec = {
     "W" : new Point(-1,0)
 };
 var directionStringMap = {
-    "S" : "―",
-    "N" : "―",
+    "S" : "\u2015",
+    "N" : "\u2015",
     "E" : "|",
     "W" : "|"
 }
