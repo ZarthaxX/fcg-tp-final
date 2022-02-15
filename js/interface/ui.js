@@ -74,7 +74,6 @@ function InitWebGL()
 			textures.push(texture);
 		}
 		meshDrawer.setTextures(textures)
-		meshDrawer.setShininess(2);
 		UpdateCanvasSize();
 		initGame();
 		DrawScene();
