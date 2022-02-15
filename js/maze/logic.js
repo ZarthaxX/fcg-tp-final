@@ -30,6 +30,12 @@ var directionsVec = {
     "E" : new Point(1,0),
     "W" : new Point(-1,0)
 };
+var directionStringMap = {
+    "S" : "―",
+    "N" : "―",
+    "E" : "|",
+    "W" : "|"
+}
 var directions = [EAST, WEST, NORTH, SOUTH]
 
 class Wall {
@@ -185,7 +191,7 @@ class Door {
     print(){
         if(this.state)
             return '.'
-        return this.direction.toString()
+        return directionStringMap[this.direction]
     }
 }
 
