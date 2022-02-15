@@ -201,7 +201,6 @@ function MatrixMult( A, B )
 window.onload = function() 
 {
 	InitWebGL();
-	lightView = new LightView();
 	canvas.zoom = function( s ) 
 	{
 		if(upperViewEnabled) transZ *= s/canvas.height + 1.0;
@@ -381,10 +380,5 @@ function setUpperView(item){
 	if(!upperViewEnabled) transZ = 0.2
 	if(upperViewEnabled) fov_angle = 60;
 	else fov_angle = 60;
-	DrawScene();
-}
-
-function SetLight(param) {
-	meshDrawer.setLight( param.checked );
 	DrawScene();
 }

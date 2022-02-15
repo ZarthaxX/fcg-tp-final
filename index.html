@@ -9,8 +9,7 @@
     <link href="css/style.css" rel="stylesheet">
     <link href="css/maze.css" rel="stylesheet">
     
-    <script type="text/javascript" id="includedscript" src="js/interface/lightview.js"></script>
-    <script type="text/javascript" id="includedscript" src="js/interface/project5.js"></script>
+    <script type="text/javascript" id="includedscript" src="js/interface/ui.js"></script>
     <script type="text/javascript" id="includedscript" src="js/interface/sceneview.js"></script>
     <script type="text/javascript" id="includedscript" src="js/interface/controls.js"></script>
     <script type="text/javascript" id="includedscript" src="js/maze/logic.js"></script>
@@ -29,11 +28,9 @@
         <div id="canvas-div"><canvas id="canvas"></canvas></div><div id="controls-div">
         <!-- menu y controles-->
         <div id="controls">
-            <div class="control-group"><canvas id="lightcontrol"></canvas><div id="lightcontrol-label">Dirección de la Luz</div></div>
             <div class="control-group">
                 <div class="control"><input id="upper-view" name="upper-view" type="checkbox" onchange="setUpperView(this)" unchecked /><label for="upper-view"> Vista superior</label></div>
-                <div class="control"><input id="light-switch" name="light-switch" type="checkbox" unchecked onchange="SetLight(this)"/><label for="light-switch"> Usar luz</label></div>
-              </div>
+            </div>
             <div class="control-group"><div id="mazesizecontrol-label">Configuracion de laberinto</div></div>
                 <div class="control"><span id="max-height-label">Maxima largo: </span><span id="max-height-value">5</span><input id="max-height" type="range" step="2" min="5" max="21" value="5" oninput="SetMaxHeight(this)"/></div>
                 <div class="control"><span id="max-width-label">Maximo ancho: </span><span id="max-width-value">5</span><input id="max-width" type="range" step="2" min="5" max="21" value="5" oninput="SetMaxWidth(this)"/></div>
