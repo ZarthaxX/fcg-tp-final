@@ -12,7 +12,15 @@ var upperViewEnabled = false;
 var fov_angle = 60
 var rotX=0, rotY=0, transZ=0.2, autorot=0;
 var textures = [];
+var focusingCanvas = false;
 
+function OnMouseEnter() {
+	focusingCanvas=true;
+}
+
+function OnMouseLeave() {
+	focusingCanvas=false;
+}
 
 class Camera {
 
@@ -222,21 +230,12 @@ window.onload = function()
 		}
 	}
 
-	var isOnDiv = false;
-	document.getElementById("controls").addEventListener("mouseenter", function(  ) {
-		isOnDiv=true;
-	});
-	document.getElementById("controls").addEventListener("mouseout", function(  ) {
-		isOnDiv=false;
-	});
-	
-
 	document.addEventListener('mousemove', (event) => {
 		mouseSensitivity = 0.05;
 		xoffset = event.movementX * mouseSensitivity;
 		yoffset = event.movementY * mouseSensitivity;
 		
-		if(mouseDown && !isOnDiv){
+		if(mouseDown && focusingCanvas){
 			rotateByEulerAngle(xoffset, yoffset)
 		}
 	});
